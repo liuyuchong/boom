@@ -6,7 +6,6 @@ import org.nutz.dao.impl.SimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 
 @Configuration
 public class DatasourceConfig {

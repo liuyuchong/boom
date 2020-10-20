@@ -4,7 +4,7 @@ import com.boom.success.consts.RoleEnums;
 import lombok.Data;
 
 @Data
-public class AddMemberRequest {
+public class AddUserRequest {
     private String username;
     private String group;
     private String position;

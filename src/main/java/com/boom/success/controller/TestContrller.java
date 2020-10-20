@@ -1,5 +1,6 @@
 package com.boom.success.controller;
 
+import com.boom.success.consts.Result;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -8,7 +9,7 @@ public class TestContrller {
 
 
     @RequestMapping("/test")
-    public String test(){
-        return "success";
+    public Result<String> test(){
+        return Result.success("success");
     }
 }

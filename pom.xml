@@ -44,6 +44,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.nutz</groupId>
+			<artifactId>nutz</artifactId>
+			<version>1.r.68.v20201011</version>
+		</dependency>
 	</dependencies>
 
 	<build>

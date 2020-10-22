@@ -9,7 +9,9 @@ import com.boom.success.request.LoginRequest;
 import com.boom.success.request.ModifyPasswordRequest;
 import com.boom.success.request.UpdateUserRequest;
 import com.boom.success.response.UserInfo;
+import com.boom.success.response.UserResponse;
 import com.boom.success.service.LoginService;
+import com.boom.success.util.LoginUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
+
+import static com.boom.success.consts.GeneralCode.NOT_AUTHORIZED;
 
 @RestController
 public class LoginController {
@@ -30,15 +34,15 @@ public class LoginController {
      * 登录
      */
     @RequestMapping(value = "/login",method = RequestMethod.POST)
-    public Result<String> login(HttpServletRequest httpServletRequest, @RequestBody LoginRequest request) {
+    public Result login(HttpServletRequest httpServletRequest, @RequestBody LoginRequest request) {
         if (request == null || StringUtils.isEmpty(request.getUsername()) || StringUtils.isEmpty(request.getPassword())) {
             return Result.fail(GeneralCode.Param_Error);
         }
-        User user = loginService.login(request);
-        if (user==null) {
-            return Result.fail(GeneralCode.Param_Error.getCode(),"账号或密码有误");
+        Result<String> result = loginService.login(request);
+        if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+            return result;
         }
-        httpServletRequest.getSession().setAttribute("username", user.getUsername());
+        httpServletRequest.getSession().setAttribute("username", request.getUsername());
         return Result.success("login sucecess");
     }
 
@@ -101,6 +105,21 @@ public class LoginController {
                                      @RequestParam(required = false) Integer pageSize,
                                      @RequestParam(required = false) Integer pageNo) {
         return loginService.getUsers(username, pageSize, pageNo);
+    }
+
+    /**
+     * 获取个人信息
+     */
+    @RequestMapping(value = "/api/own", method = RequestMethod.GET)
+    public Result<UserResponse> getUser(HttpServletRequest request) {
+        String username = LoginUtil.getUsername(request);
+        User user = loginService.getUserByName(username);
+        if (user == null) {
+            return Result.fail(NOT_AUTHORIZED);
+        }
+        UserResponse response = new UserResponse();
+        BeanUtils.copyProperties(user,response);
+        return Result.success(response);
     }
 
     /**

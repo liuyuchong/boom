@@ -1,6 +1,7 @@
 package com.boom.success.service;
 
 import com.boom.success.bo.User;
+import com.boom.success.consts.GeneralCode;
 import com.boom.success.consts.Result;
 import com.boom.success.request.AddUserRequest;
 import com.boom.success.request.LoginRequest;
@@ -17,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LoginService {
@@ -25,8 +27,20 @@ public class LoginService {
     private Dao dao;
 
 
-    public User login(LoginRequest request) {
-        return dao.fetch(User.class, Cnd.where("username", "=", request.getUsername()).and("password", "=", request.getPassword()));
+    public Result login(LoginRequest request) {
+        User user = getUserByName(request.getUsername());
+        if (user==null){
+            return Result.fail(GeneralCode.Param_Error.getCode(), "账号不存在");
+        }
+
+        if (!Objects.equals(user.getPassword(),request.getPassword())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "账号或密码有误");
+        }
+        return Result.success(null);
+    }
+
+    public User getUserByName(String username) {
+        return dao.fetch(User.class, Cnd.where("username", "=", username));
     }
 
     public boolean exist(String username) {

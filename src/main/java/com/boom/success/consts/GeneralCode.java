@@ -1,7 +1,9 @@
 package com.boom.success.consts;
 
 public enum GeneralCode {
-    Param_Error(400,"params error");
+    Param_Error(400,"params error"),
+    NOT_AUTHORIZED(401,"not authorized"),
+    SUCCESS(0,"success");
     private int code;
     private String msg;
 

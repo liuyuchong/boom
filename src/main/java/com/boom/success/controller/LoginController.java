@@ -47,6 +47,25 @@ public class LoginController {
     }
 
     /**
+     * 登录
+     */
+    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    public Result login2(String username,String password,HttpServletRequest httpServletRequest) {
+        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+            return Result.fail(GeneralCode.Param_Error);
+        }
+        LoginRequest request = new LoginRequest();
+        request.setUsername(username);
+        request.setPassword(password);
+        Result<String> result = loginService.login(request);
+        if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+            return result;
+        }
+        httpServletRequest.getSession().setAttribute("username", request.getUsername());
+        return Result.success("login sucecess");
+    }
+
+    /**
      * 登出
      */
     @RequestMapping("logout")

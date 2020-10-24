@@ -1,0 +1,322 @@
+----------------------用户相关接口-----------------------
+1. 登录
+path  /login  
+请求方式： POST
+参数：
+public class LoginRequest {
+    private String username;
+    private String password;
+}
+结果：
+{
+    "data": "login sucecess",
+    "code": 0,
+    "msg": "success"
+}
+
+2. 登出
+path  /logout
+请求方式： POST
+参数： 无
+
+结果：
+{
+    "data": "logout successfully",
+    "code": 0,
+    "msg": "success"
+}
+
+3. 添加成员
+path： /api/user
+请求方式： POST
+参数：
+public class AddUserRequest {
+    //用户名
+    private String username;
+    //队伍信息
+    private String group;
+    //职位
+    private String position;
+    //手机号
+    private String phoneNumber;
+    /**
+     * @see RoleEnums
+     * ADMIN(1,"系统管理员"),
+     * WORD(2,"读写权限"),
+     * GUEST(3,"只读权限");
+     */
+    private Integer role;
+}
+结果：
+{
+    "data": null,
+    "code": 0,
+    "msg": "success"
+}
+
+4. 获取成员列表
+path：  /api/userList
+请求方式： GET
+//搜索框 按姓名搜索
+@RequestParam(required = false) String username,
+//页面大小
+@RequestParam(required = false) Integer pageSize,
+//页号（表示第几页）
+@RequestParam(required = false) Integer pageNo
+结果：
+{
+    "data": {
+        "total": 2,
+        "users": [
+            {
+                "id": 8,
+                "username": "刘玉冲3",
+                "group": "test group",
+                "position": "test user",
+                "phoneNumber": "15245874254",
+                "role": 1
+            }
+        ]
+    },
+    "code": 0,
+    "msg": "success"
+}
+
+5. 获取个人信息
+path： /api/own
+请求方式： GET
+参数： 无
+结果：
+{
+    "data": {
+        "id": 8,
+        "username": "刘玉冲3",
+        "group": "测试组",
+        "position": "test position",
+        "phoneNumber": "15202315162",
+        "role": 3
+    },
+    "code": 0,
+    "msg": "success"
+}
+
+
+6. 修改用户信息
+path： /api/user
+请求方式： PUT
+参数：
+private Integer id;
+private String group;
+private String position;
+private String phoneNumber;
+/**
+* @see RoleEnums
+* ADMIN(1,"系统管理员"),
+* WORD(2,"读写权限"),
+* GUEST(3,"只读权限");
+*/
+private Integer role;
+结果：
+{
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}
+
+7. 修改密码
+path： /api/modifyPassword
+请求方式： POST
+参数：
+private int id;
+private String originalPassword;
+private String newPassword;
+结果：
+{
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}
+
+
+-------------------------项目相关接口-----------------
+1. 创建项目
+path： /api/project
+method： POST
+参数： string name 
+结果：
+ {
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}
+
+2. 修改项目
+path： /api/project
+method： PUT
+参数： 
+private Integer id;
+private String name;
+结果：
+ {
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}
+
+3. 获取项目列表
+path： /api/projects
+method： GET
+参数： 无
+结果：
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "测试项目11"
+        },
+        {
+            "id": 2,
+            "name": "测试项目2"
+        }
+    ],
+    "code": 0,
+    "msg": "success"
+}
+
+4. 删除项目
+path： /api/project
+method： DELETE
+参数： 
+Long id
+结果：
+ {
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}
+
+--------------------雷管相关接口---------------
+1. 雷管批量操作接口 （包含入库 发出 退回 使用）
+path：  /api/leiguan/batch
+method： POST
+ //操作时间
+    private Long date;
+
+    //操作类型
+    /**
+     * INIT(1,"入库"),
+       ON_GOING(2,"发出"),
+       BACK(3,"退回"),
+       CONSUMED(4,"已使用");
+     */
+    private Integer optType;
+
+    //固定码
+    private String fixCode;
+
+    //发码起始值(含)
+    private Integer from;
+
+    //发码终止值(含)
+    private Integer to;
+
+    //保管人
+    private String keeper;
+
+    //领退人
+    private String consumer;
+
+结果：
+{
+    "data": 40,
+    "code": 0,
+    "msg": "success"
+}
+
+2. 查询符合条件的雷管信息
+path： /api/leiguan/list
+method： GET
+参数：
+@RequestParam(required = false) String fixCode,    //固定码
+@RequestParam(required = false) Integer childCode,  //子码
+@RequestParam(required = false) Integer from,       //子码范围搜索起始值
+@RequestParam(required = false) Integer to,         //子码范围搜索终止值  
+@RequestParam(required = false) Integer status,     //状态 1 入库 2 发出 3退回 4已使用
+@RequestParam(required = false) Integer pageNo,     //第几页
+@RequestParam(required = false) Integer pageSize    //页面大小
+结果：
+{
+    "data": {
+        "leiGuanList": [
+            {
+                "id": 15013,
+                "fixCode": "152011",
+                "childCode": 12,
+                "storeTime": 1603480559565,
+                "sendTime": 1603480559565,
+                "backTime": 1603480559565,
+                "useTime": null,
+                "status": 3,
+                "keeper": "保管人",
+                "consumer": null
+            },
+            {
+                "id": 15012,
+                "fixCode": "152011",
+                "childCode": 11,
+                "storeTime": 1603480559565,
+                "sendTime": 1603480559565,
+                "backTime": 1603480559565,
+                "useTime": null,
+                "status": 3,
+                "keeper": "保管人",
+                "consumer": null
+            },
+            {
+                "id": 15011,
+                "fixCode": "152011",
+                "childCode": 10,
+                "storeTime": 1603480559565,
+                "sendTime": null,
+                "backTime": 1603480559565,
+                "useTime": null,
+                "status": 3,
+                "keeper": "保管人",
+                "consumer": null
+            }
+        ],
+        "total": 3
+    },
+    "code": 0,
+    "msg": "success"
+}
+
+3. 更新单个雷管信息
+path： /api/leiguan
+method： PUT
+参数：
+ private Long id;
+//固定码
+private String fixCode;
+//发码
+private Integer childCode;
+//入库时间
+private Long storeTime;
+//发出时间
+private Long sendTime;
+//退回时间
+private Long backTime;
+//使用时间
+private Long useTime;
+//当前状态
+private Integer status;
+//保管人
+private String keeper;
+//领退人
+private String consumer;
+结果：
+{
+    "data": true,
+    "code": 0,
+    "msg": "success"
+}

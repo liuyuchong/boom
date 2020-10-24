@@ -1,6 +1,6 @@
 package com.boom.success.consts;
 
-public enum LeiGuanStatusEnums {
+public enum StatusEnums {
     INIT(1,"入库"),
     ON_GOING(2,"发出"),
     BACK(3,"退回"),
@@ -8,7 +8,7 @@ public enum LeiGuanStatusEnums {
     private int code;
     private String desc;
 
-    LeiGuanStatusEnums(int code, String desc) {
+    StatusEnums(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -21,11 +21,11 @@ public enum LeiGuanStatusEnums {
         return desc;
     }
 
-    public static LeiGuanStatusEnums get(Integer code) {
+    public static StatusEnums get(Integer code) {
         if (code == null) {
             return null;
         }
-        for (LeiGuanStatusEnums e : LeiGuanStatusEnums.values()) {
+        for (StatusEnums e : StatusEnums.values()) {
             if (e.getCode() == code) {
                 return e;
             }

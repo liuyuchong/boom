@@ -320,3 +320,52 @@ private String consumer;
     "code": 0,
     "msg": "success"
 }
+
+4. 按日期查账单
+path: /api/leiguan/log
+method: GET
+参数：
+  @RequestParam Long date,
+  @RequestParam(required = false) Integer pageNo,
+  @RequestParam(required = false) Integer paseSize
+结果：
+  {
+    "data": {
+      "records": [
+      {
+        "id": 21,
+        "date": 1603888559565,
+        "operation": "入库",
+        "fixCode": "152011",
+        "from": 8,
+        "to": 15,
+        "keeper": "刘玉冲",
+        "consumer": "爆破人",
+        "operator": "刘玉冲3",
+        "store": 7,
+        "send": null,
+        "back": null,
+        "consumed": null
+      },
+      {
+        "id": 22,
+        "date": 1603888559565,
+        "operation": "入库",
+        "fixCode": "152011",
+        "from": 1,
+        "to": 7,
+        "keeper": "刘玉冲",
+        "consumer": "爆破人",
+        "operator": "刘玉冲3",
+        "store": 6,
+        "send": null,
+        "back": null,
+        "consumed": null
+      }
+      ],
+      "stock": 17,
+      "total": 6
+    },
+    "code": 0,
+    "msg": "success"
+  }

@@ -6,9 +6,9 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Table;
 
+@Table("zhayao_log")
 @Data
-@Table("leiguan_log")
-public class LeiGuanLog {
+public class ZhaYaoLog {
     @Id
     private Long id;
 
@@ -21,17 +21,29 @@ public class LeiGuanLog {
     @Column
     private String operation;
 
-    //固定码
-    @Column("fix_code")
-    private String fixCode;
+    //批次号
+    @Column("batch_num")
+    private String batchNum;
 
-    //发码起始值
-    @Column("child_from")
-    private Integer from;
+    //箱号起始值
+    @Column("box_from")
+    private Integer boxFrom;
 
-    //发码结束值
-    @Column("child_to")
-    private Integer to;
+    //箱号结束值
+    @Column("box_from")
+    private Integer boxTo;
+
+    //柱号起始值
+    @Column("col_from")
+    private Integer colFrom;
+
+    //柱号结束值
+    @Column("col_to")
+    private Integer colTo;
+
+    //操作数量(kg)
+    @Column
+    private Integer count;
 
     //保管人
     @Column

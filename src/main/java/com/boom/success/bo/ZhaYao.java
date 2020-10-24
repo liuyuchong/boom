@@ -7,18 +7,26 @@ import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Table;
 
 @Data
-@Table("leiguan_info")
-public class LeiGuan {
+@Table("zhayao_info")
+public class ZhaYao {
     @Id
     private Long id;
 
-    //固定码
-    @Column("fix_code")
-    private String fixCode;
+    //批次号
+    @Column("batch_num")
+    private String batchNum;
 
-    //发码
-    @Column("child_code")
-    private Integer childCode;
+    //箱号
+    @Column("box_num")
+    private Integer boxNum;
+
+    //柱号
+    @Column("col_num")
+    private Integer colNum;
+
+    //规格/单位(kg)
+    @Column
+    private float unit;
 
     //入库时间
     @Column("store_time")
@@ -50,5 +58,4 @@ public class LeiGuan {
     //领退人
     @Column
     private String consumer;
-
 }

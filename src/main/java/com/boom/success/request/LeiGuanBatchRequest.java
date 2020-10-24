@@ -1,6 +1,6 @@
 package com.boom.success.request;
 
-import com.boom.success.consts.LeiGuanStatusEnums;
+import com.boom.success.consts.StatusEnums;
 import lombok.Data;
 
 @Data
@@ -10,7 +10,7 @@ public class LeiGuanBatchRequest {
 
     //操作类型
     /**
-     * @see LeiGuanStatusEnums
+     * @see StatusEnums
      */
     private Integer optType;
 

@@ -3,10 +3,12 @@ package com.boom.success.service;
 import com.boom.success.bo.LeiGuan;
 import com.boom.success.bo.LeiGuanLog;
 import com.boom.success.consts.GeneralCode;
-import com.boom.success.consts.LeiGuanStatusEnums;
 import com.boom.success.consts.Result;
+import com.boom.success.consts.StatusEnums;
 import com.boom.success.request.LeiGuanBatchRequest;
+import com.boom.success.response.LeiguanRecordResponse;
 import com.boom.success.response.LeiGuanResponse;
+import com.boom.success.util.TimeUtil;
 import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -18,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -93,7 +96,7 @@ public class LeiGuanService {
         for (int i = request.getFrom(); i <= request.getTo(); i++) {
             LeiGuan leiGuan = new LeiGuan();
             leiGuan.setStoreTime(request.getDate());
-            leiGuan.setStatus(LeiGuanStatusEnums.INIT.getCode());
+            leiGuan.setStatus(StatusEnums.INIT.getCode());
             leiGuan.setKeeper(request.getKeeper());
             leiGuan.setFixCode(request.getFixCode());
             leiGuan.setChildCode(i);
@@ -130,11 +133,11 @@ public class LeiGuanService {
      */
     public int batchUpdate(LeiGuanBatchRequest request) {
         Chain chain = Chain.make("status", request.getOptType());
-        if (request.getOptType() == LeiGuanStatusEnums.ON_GOING.getCode()) {
+        if (request.getOptType() == StatusEnums.ON_GOING.getCode()) {
             chain.add("send_time", request.getDate());
-        } else if (request.getOptType() == LeiGuanStatusEnums.BACK.getCode()) {
+        } else if (request.getOptType() == StatusEnums.BACK.getCode()) {
             chain.add("back_time", request.getDate());
-        } else if (request.getOptType() == LeiGuanStatusEnums.BACK.getCode()) {
+        } else if (request.getOptType() == StatusEnums.CONSUMED.getCode()) {
             chain.add("use_time", request.getDate());
         } else {
             return 0;
@@ -149,4 +152,47 @@ public class LeiGuanService {
         cnd = cnd.and("fix_code", "=", fixCode).and("child_code", ">=", from).and("child_code", "<=", to);
         return dao.query(LeiGuan.class, cnd);
     }
+
+    public LeiguanRecordResponse getLog(Long time, Integer pageNo, Integer pageSize) {
+        if (time == null) {
+            return null;
+        }
+        if (pageNo==null||pageNo <= 0) {
+            pageNo = 1;
+        }
+        if (pageSize==null||pageSize <= 0) {
+            pageSize = 10;
+        }
+        long start = TimeUtil.getStart(time);
+        long end = TimeUtil.getStart(time);
+        LeiguanRecordResponse recordResponse = new LeiguanRecordResponse();
+        Cnd cnd = Cnd.NEW();
+        cnd.and("date", ">=", start).and("date", "<=", end);
+        List<LeiGuanLog> logs = dao.query(LeiGuanLog.class, cnd, new Pager(pageNo, pageSize));
+        recordResponse.setTotal(dao.count(LeiGuanLog.class, cnd));
+        recordResponse.setRecords(logs);
+        for (LeiGuanLog e : logs) {
+            int count = e.getTo() - e.getFrom() + 1;
+            if (e.getOperation().equals(StatusEnums.INIT.getDesc())) {
+                e.setStore(count);
+            }else if (e.getOperation().equals(StatusEnums.ON_GOING.getDesc())) {
+                e.setSend(count);
+            }else if (e.getOperation().equals(StatusEnums.BACK.getDesc())) {
+                e.setBack(count);
+            }else if (e.getOperation().equals(StatusEnums.CONSUMED.getDesc())) {
+                e.setConsumed(count);
+            }
+        }
+
+            //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
+            cnd = Cnd.NEW();
+        cnd.and("storeTime", "<", end);
+        int stockSum = dao.count(LeiGuan.class, cnd);
+        cnd = Cnd.NEW();
+        cnd.and("use_time", "<", end);
+        int useSum = dao.count(LeiGuan.class, cnd);
+        recordResponse.setStock(stockSum-useSum);
+        return recordResponse;
+    }
 }
+

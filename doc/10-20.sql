@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 24/10/2020 04:47:40
+ Date: 25/10/2020 01:20:34
 */
 
 SET NAMES utf8mb4;
@@ -47,7 +47,7 @@ CREATE TABLE `leiguan_info`  (
   `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `key1`(`fix_code`, `child_code`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15202 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for leiguan_log
@@ -55,7 +55,7 @@ CREATE TABLE `leiguan_info`  (
 DROP TABLE IF EXISTS `leiguan_log`;
 CREATE TABLE `leiguan_log`  (
   `id` int(20) NOT NULL AUTO_INCREMENT,
-  `date` bigint(20) NULL DEFAULT NULL COMMENT '日期',
+  `date` bigint(20) NOT NULL COMMENT '日期',
   `operation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作 1入库 2发出 3退回 4使用',
   `fix_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '固定码',
   `child_from` int(20) NOT NULL COMMENT '发码起始值',
@@ -64,7 +64,7 @@ CREATE TABLE `leiguan_log`  (
   `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
   `operator` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '系统录入人员',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for project
@@ -75,7 +75,7 @@ CREATE TABLE `project`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `key1`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
@@ -91,6 +91,47 @@ CREATE TABLE `user`  (
   `role` tinyint(4) NOT NULL COMMENT 'admin(1),work(2),guest(3)',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `key1`(`username`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for zhayao_info
+-- ----------------------------
+DROP TABLE IF EXISTS `zhayao_info`;
+CREATE TABLE `zhayao_info`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '批次号',
+  `box_num` int(20) NOT NULL COMMENT '箱号',
+  `col_num` tinyint(4) NOT NULL COMMENT '柱号',
+  `unit` float(20, 1) NOT NULL COMMENT '单位（kg）',
+  `store_time` bigint(20) NOT NULL COMMENT '入库时间',
+  `send_time` bigint(20) NULL DEFAULT NULL COMMENT '发出时间',
+  `back_time` bigint(20) NULL DEFAULT NULL COMMENT '退还时间',
+  `use_time` bigint(20) NULL DEFAULT NULL COMMENT '使用时间',
+  `status` tinyint(4) NOT NULL COMMENT '状态',
+  `keeper` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '保管员',
+  `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `key1`(`batch_num`, `box_num`, `col_num`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for zhayao_log
+-- ----------------------------
+DROP TABLE IF EXISTS `zhayao_log`;
+CREATE TABLE `zhayao_log`  (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `date` bigint(20) NOT NULL COMMENT '日期',
+  `operation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作 1入库 2发出 3退回 4使用',
+  `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '批次号',
+  `box_from` tinyint(4) NOT NULL COMMENT '箱号起始值',
+  `box_to` tinyint(4) NOT NULL COMMENT '箱号结束值',
+  `col_from` tinyint(4) NULL DEFAULT NULL COMMENT '柱号起始值',
+  `col_to` tinyint(4) NULL DEFAULT NULL COMMENT '柱号结束值',
+  `count` int(20) NOT NULL COMMENT '操作数值（kg）',
+  `keeper` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '保管人',
+  `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
+  `operator` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '系统录入人员',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

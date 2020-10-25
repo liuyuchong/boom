@@ -68,7 +68,7 @@ public class LoginController {
     /**
      * 登出
      */
-    @RequestMapping("logout")
+    @RequestMapping("/logout")
     public Result<String> logout(HttpServletRequest request){
         request.getSession().invalidate();
         return Result.success("logout successfully");

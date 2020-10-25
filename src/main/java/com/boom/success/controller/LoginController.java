@@ -38,12 +38,12 @@ public class LoginController {
         if (request == null || StringUtils.isEmpty(request.getUsername()) || StringUtils.isEmpty(request.getPassword())) {
             return Result.fail(GeneralCode.Param_Error);
         }
-        Result<String> result = loginService.login(request);
+        Result<UserResponse> result = loginService.login(request);
         if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
             return result;
         }
         httpServletRequest.getSession().setAttribute("username", request.getUsername());
-        return Result.success("login sucecess");
+        return result;
     }
 
     /**
@@ -57,7 +57,7 @@ public class LoginController {
         LoginRequest request = new LoginRequest();
         request.setUsername(username);
         request.setPassword(password);
-        Result<String> result = loginService.login(request);
+        Result result = loginService.login(request);
         if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
             return result;
         }

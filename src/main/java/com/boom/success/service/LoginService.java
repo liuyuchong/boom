@@ -27,7 +27,7 @@ public class LoginService {
     private Dao dao;
 
 
-    public Result login(LoginRequest request) {
+    public Result<UserResponse> login(LoginRequest request) {
         User user = getUserByName(request.getUsername());
         if (user==null){
             return Result.fail(GeneralCode.Param_Error.getCode(), "账号不存在");
@@ -36,7 +36,9 @@ public class LoginService {
         if (!Objects.equals(user.getPassword(),request.getPassword())) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "账号或密码有误");
         }
-        return Result.success(null);
+        UserResponse userResponse = new UserResponse();
+        BeanUtils.copyProperties(user, userResponse);
+        return Result.success(userResponse);
     }
 
     public User getUserByName(String username) {

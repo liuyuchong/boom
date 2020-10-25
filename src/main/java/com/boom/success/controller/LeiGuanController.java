@@ -86,10 +86,8 @@ public class LeiGuanController {
         if (request.getOptType().intValue() == StatusEnums.INIT.getCode() && StringUtils.isEmpty(request.getKeeper())) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "入库必须填写保管人");
         }
-        if ((request.getOptType().intValue() == StatusEnums.ON_GOING.getCode()
-                || request.getOptType().intValue() == StatusEnums.BACK.getCode())
-                && StringUtils.isEmpty(request.getConsumer())) {
-            return Result.fail(GeneralCode.Param_Error.getCode(), "发出或退回必须填写领退人");
+        if (request.getOptType().intValue() != StatusEnums.INIT.getCode() && StringUtils.isEmpty(request.getConsumer())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写领退人");
         }
         int count = 0;
         switch (statusEnums) {

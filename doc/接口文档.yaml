@@ -369,3 +369,115 @@ method: GET
     "code": 0,
     "msg": "success"
   }
+
+  --------------------炸药相关接口---------------
+  1. 炸药批量操作接口 （包含入库 发出 退回 使用）
+  path：  /api/zhayao/batch
+  method： POST
+  参数：
+  //操作时间
+  private Long date;
+  //操作类型  1入库 2发出  3退回 4使用
+  private Integer optType;
+  //批次号
+  private String batchNum;
+  //箱号起始值
+  private Integer boxFrom;
+  //箱号结束值
+  private Integer boxTo;
+  //炸药规格  0  0.5kg/柱  1  1kg/柱  2  2kg/柱
+  private Integer type;
+  //柱号起始值
+  private Integer colFrom;
+  //柱号结束值
+  private Integer colTo;
+  //保管人
+  private String keeper;
+  //领退人
+  private String consumer;
+
+  {
+    "date":1603888559565,
+    "optType":4,
+    "batchNum":"batch1",
+    "boxFrom":"0624",
+    "boxTo":"1266",
+    "type":2,
+    "colFrom":0,
+    "colTo":18,
+    "consumer":"领退人"
+  }
+  结果：
+  {
+    "data": 40,
+    "code": 0,
+    "msg": "success"
+  }
+
+  2. 查询符合条件的炸药信息
+  path： /api/zhayao/list
+  method： GET
+  参数：
+  (@RequestParam(required = false) String batchNum,
+  @RequestParam(required = false) Integer boxFrom,
+  @RequestParam(required = false) Integer boxTo,
+  @RequestParam(required = false) Integer colFrom,
+  @RequestParam(required = false) Integer colTo,
+  @RequestParam(required = false) Integer status,
+  @RequestParam(required = false) Integer pageNo,
+  @RequestParam(required = false) Integer pageSize
+  结果：
+  {
+    "data": {
+      "zhaYaoList": [
+      {
+        "id": 4487,
+        "batchNum": "batch1",
+        "boxNum": 600,
+        "colNum": 11,
+        "unit": 2.0,
+        "storeTime": 1603888559565,
+        "sendTime": 1603888559565,
+        "backTime": 1603888559565,
+        "useTime": 1603888559565,
+        "status": 4,
+        "keeper": "领退人",
+        "consumer": "领退人"
+      }
+      ],
+      "total": 1
+    },
+    "code": 0,
+    "msg": "success"
+  }
+
+  3. 更新单个炸药信息
+  path： /api/zhayao
+  method： PUT
+  参数：
+  {
+    "id": 4776,
+    "batchNum": "batch1",
+    "boxNum": 624,
+    "colNum": 12,
+    "unit": 1.0,
+    "storeTime": 1603888559565,
+    "sendTime": 1603888559565,
+    "backTime": 1603888559565,
+    "useTime": 1603888559565,
+    "status": 4,
+    "keeper": "保管员",
+    "consumer": "领退人"
+  }
+  结果：
+  {
+    "data": true,
+    "code": 0,
+    "msg": "success"
+  }
+
+  4. 按日期查账单
+path: /api/leiguan/log
+method: GET
+  参数：
+  结果：

@@ -62,7 +62,7 @@ public class LeiGuanService {
         if (pageSize==null||pageSize <= 0) {
             pageSize = 100;
         }
-        OrderBy orderBy = cnd.desc("fix_code").desc("child_code");
+        OrderBy orderBy = cnd.desc("id");
         List<LeiGuan> list = dao.query(LeiGuan.class, orderBy, new Pager(pageNo, pageSize));
         int total = dao.count(LeiGuan.class, cnd);
         LeiGuanResponse leiGuanResponse = new LeiGuanResponse();
@@ -132,7 +132,7 @@ public class LeiGuanService {
      * 批量修改
      */
     public int batchUpdate(LeiGuanBatchRequest request) {
-        Chain chain = Chain.make("status", request.getOptType());
+        Chain chain = Chain.make("status", request.getOptType()).add("consumer",request.getConsumer());
         if (request.getOptType() == StatusEnums.ON_GOING.getCode()) {
             chain.add("send_time", request.getDate());
         } else if (request.getOptType() == StatusEnums.BACK.getCode()) {

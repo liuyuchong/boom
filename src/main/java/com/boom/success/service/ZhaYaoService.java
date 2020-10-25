@@ -36,7 +36,7 @@ public class ZhaYaoService {
     public ZhaYaoResponse query(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo, Integer status, Integer pageNo, Integer pageSize) {
         Cnd cnd = Cnd.NEW();
         if (!StringUtils.isEmpty(batchNum)) {
-            cnd = cnd.and("batchNum", "like", "%" + batchNum + "%");
+            cnd = cnd.and("batch_num", "like", "%" + batchNum + "%");
         }
         if (boxFrom != null) {
             cnd = cnd.and("box_num", ">=", boxFrom);
@@ -59,7 +59,7 @@ public class ZhaYaoService {
         if (pageSize == null || pageSize <= 0) {
             pageSize = 100;
         }
-        OrderBy orderBy = cnd.desc("batchNum").desc("box_num").desc("col_num");
+        OrderBy orderBy = cnd.desc("id");
         List<ZhaYao> list = dao.query(ZhaYao.class, orderBy, new Pager(pageNo, pageSize));
         int total = dao.count(ZhaYao.class, cnd);
         ZhaYaoResponse zhaYaoResponse = new ZhaYaoResponse();
@@ -134,7 +134,7 @@ public class ZhaYaoService {
      * 批量修改
      */
     public int batchUpdate(ZhaYaoBatchRequest request) {
-        Chain chain = Chain.make("status", request.getOptType());
+        Chain chain = Chain.make("status", request.getOptType()).add("consumer", request.getConsumer());
         if (request.getOptType() == StatusEnums.ON_GOING.getCode()) {
             chain.add("send_time", request.getDate());
         } else if (request.getOptType() == StatusEnums.BACK.getCode()) {
@@ -187,7 +187,7 @@ public class ZhaYaoService {
         recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
         recordResponse.setRecords(logs);
         for (ZhaYaoLog e : logs) {
-            int count = e.getCount();
+            float count = e.getCount();
             if (e.getOperation().equals(StatusEnums.INIT.getDesc())) {
                 e.setStore(count);
             } else if (e.getOperation().equals(StatusEnums.ON_GOING.getDesc())) {

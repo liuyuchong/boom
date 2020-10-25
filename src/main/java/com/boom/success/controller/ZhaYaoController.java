@@ -57,7 +57,7 @@ public class ZhaYaoController {
      * 批量插入/修改炸药信息
      */
     @RequestMapping(value = "/api/zhayao/batch", method = RequestMethod.POST)
-    public Result<Integer> batch(@RequestBody ZhaYaoBatchRequest request, HttpServletRequest servletRequest) {
+    public Result batch(@RequestBody ZhaYaoBatchRequest request, HttpServletRequest servletRequest) {
         String username = LoginUtil.getUsername(servletRequest);
         if (username == null) {
             return Result.fail(GeneralCode.NOT_AUTHORIZED.getCode(), "请登录");
@@ -98,19 +98,17 @@ public class ZhaYaoController {
                 return Result.fail(GeneralCode.Param_Error.getCode(), "入库必须选择炸药规格");
             }
         }
-        if ((request.getOptType().intValue() == StatusEnums.ON_GOING.getCode()
-                || request.getOptType().intValue() == StatusEnums.BACK.getCode())
-                && StringUtils.isEmpty(request.getConsumer())) {
-            return Result.fail(GeneralCode.Param_Error.getCode(), "发出或退回必须填写领退人");
+        if (request.getOptType().intValue() != StatusEnums.INIT.getCode() && StringUtils.isEmpty(request.getConsumer())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写领退人");
         }
         //操作炸药柱数
         int count = 0;
         //本次操作炸药总重量（kg）
-        int totalWeight = 0;
+        double totalWeight = 0;
         switch (statusEnums) {
             case INIT:
                 //入库，检查批次下的箱号是否存在
-                Result<Integer> result = service.checkIfExist(request.getBatchNum(), request.getBoxFrom(), request.getBoxTo());
+                Result result = service.checkIfExist(request.getBatchNum(), request.getBoxFrom(), request.getBoxTo());
                 if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
                     return result;
                 }
@@ -120,11 +118,11 @@ public class ZhaYaoController {
                 break;
             default:
                 //检查对应的批次号、箱号、柱号是否存在
-                result = service.checkIfExist2(request.getBatchNum(), request.getBoxFrom(), request.getBoxTo(), request.getColFrom(), request.getColTo());
-                if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
-                    return result;
+                Result<Double> result2 = service.checkIfExist2(request.getBatchNum(), request.getBoxFrom(), request.getBoxTo(), request.getColFrom(), request.getColTo());
+                if (result2.getCode() != GeneralCode.SUCCESS.getCode()) {
+                    return result2;
                 }
-                totalWeight = result.getData();
+                totalWeight = result2.getData();
                 count = service.batchUpdate(request);
         }
 
@@ -133,7 +131,7 @@ public class ZhaYaoController {
         BeanUtils.copyProperties(request, log);
         log.setOperator(username);
         log.setOperation(statusEnums.getDesc());
-        log.setCount(totalWeight);
+        log.setCount((float) totalWeight);
         service.insertLog(log);
         return Result.success(count);
     }

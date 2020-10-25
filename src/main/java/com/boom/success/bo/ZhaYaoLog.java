@@ -30,7 +30,7 @@ public class ZhaYaoLog {
     private Integer boxFrom;
 
     //箱号结束值
-    @Column("box_from")
+    @Column("box_to")
     private Integer boxTo;
 
     //柱号起始值
@@ -43,7 +43,7 @@ public class ZhaYaoLog {
 
     //操作数量(kg)
     @Column
-    private Integer count;
+    private Float count;
 
     //保管人
     @Column
@@ -58,11 +58,11 @@ public class ZhaYaoLog {
     private String operator;
 
     //入库
-    private Integer store;
+    private Float store;
     //发出
-    private Integer send;
+    private Float send;
     //回退
-    private Integer back;
+    private Float back;
     //使用
-    private Integer consumed;
+    private Float consumed;
 }

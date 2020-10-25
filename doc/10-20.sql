@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 25/10/2020 01:20:34
+ Date: 26/10/2020 01:41:43
 */
 
 SET NAMES utf8mb4;
@@ -123,11 +123,11 @@ CREATE TABLE `zhayao_log`  (
   `date` bigint(20) NOT NULL COMMENT '日期',
   `operation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '操作 1入库 2发出 3退回 4使用',
   `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '批次号',
-  `box_from` tinyint(4) NOT NULL COMMENT '箱号起始值',
-  `box_to` tinyint(4) NOT NULL COMMENT '箱号结束值',
+  `box_from` int(20) NOT NULL COMMENT '箱号起始值',
+  `box_to` int(20) NOT NULL COMMENT '箱号结束值',
   `col_from` tinyint(4) NULL DEFAULT NULL COMMENT '柱号起始值',
   `col_to` tinyint(4) NULL DEFAULT NULL COMMENT '柱号结束值',
-  `count` int(20) NOT NULL COMMENT '操作数值（kg）',
+  `count` float(20, 0) NOT NULL COMMENT '操作数值（kg）',
   `keeper` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '保管人',
   `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
   `operator` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '系统录入人员',

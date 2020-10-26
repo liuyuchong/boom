@@ -78,7 +78,7 @@ public class LoginController {
      * 添加成员
      */
     @RequestMapping(value = "/api/user",method = RequestMethod.POST)
-    public Result<String> add(@RequestBody AddUserRequest request) {
+    public Result<Boolean> add(@RequestBody AddUserRequest request) {
         if (request == null || StringUtils.isEmpty(request.getUsername()) || StringUtils.isEmpty(request.getPhoneNumber())
                 || null == RoleEnums.getRole(request.getRole())) {
             return Result.fail(GeneralCode.Param_Error);

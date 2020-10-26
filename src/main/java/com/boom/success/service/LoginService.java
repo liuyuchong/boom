@@ -53,14 +53,14 @@ public class LoginService {
         return dao.fetch(User.class, id);
     }
 
-    public Result<String> addMember(AddUserRequest request) {
+    public Result<Boolean> addMember(AddUserRequest request) {
         User user = new User();
         BeanUtils.copyProperties(request, user);
         //手机号后四位为密码
         String phoneNumber = request.getPhoneNumber();
         user.setPassword(phoneNumber.substring(phoneNumber.length() - 4));
         dao.insert(user);
-        return Result.success(null);
+        return Result.success(true);
     }
 
     public boolean update(User user) {

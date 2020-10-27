@@ -38,7 +38,7 @@ CREATE TABLE `leiguan_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `fix_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '固定码',
   `child_code` int(20) NOT NULL COMMENT '发码',
-  `store_time` bigint(20) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '入库时间',
+  `store_time` bigint(20) NOT NULL DEFAULT NULL COMMENT '入库时间',
   `send_time` bigint(20) NULL DEFAULT NULL COMMENT '发出时间',
   `back_time` bigint(20) NULL DEFAULT NULL COMMENT '退回时间',
   `use_time` bigint(20) NULL DEFAULT NULL COMMENT '使用时间',

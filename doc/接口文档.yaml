@@ -477,7 +477,7 @@ method: GET
   }
 
   4. 按日期查账单
-path: /api/leiguan/log
+path: /api/zhayao/log
 method: GET
   参数：
   结果：

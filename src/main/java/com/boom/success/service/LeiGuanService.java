@@ -154,23 +154,38 @@ public class LeiGuanService {
     }
 
     public LeiguanRecordResponse getLog(Long time, Integer pageNo, Integer pageSize) {
-        if (time == null) {
-            return null;
-        }
         if (pageNo==null||pageNo <= 0) {
             pageNo = 1;
         }
         if (pageSize==null||pageSize <= 0) {
             pageSize = 10;
         }
-        long start = TimeUtil.getStart(time);
-        long end = TimeUtil.getStart(time);
         LeiguanRecordResponse recordResponse = new LeiguanRecordResponse();
+        List<LeiGuanLog> logs;
         Cnd cnd = Cnd.NEW();
-        cnd.and("date", ">=", start).and("date", "<=", end);
-        List<LeiGuanLog> logs = dao.query(LeiGuanLog.class, cnd, new Pager(pageNo, pageSize));
-        recordResponse.setTotal(dao.count(LeiGuanLog.class, cnd));
-        recordResponse.setRecords(logs);
+        int stock;
+        if (time != null) {
+            long start = TimeUtil.getStart(time);
+            long end = TimeUtil.getEnd(time);
+            cnd.and("date", ">=", start).and("date", "<=", end);
+            logs = dao.query(LeiGuanLog.class, cnd, new Pager(pageNo, pageSize));
+            recordResponse.setTotal(dao.count(LeiGuanLog.class, cnd));
+            //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
+            cnd = Cnd.NEW();
+            cnd.and("storeTime", "<", end);
+            int stockSum = dao.count(LeiGuan.class, cnd);
+            cnd = Cnd.NEW();
+            cnd.and("use_time", "<", end);
+            int useSum = dao.count(LeiGuan.class, cnd);
+            stock = stockSum - useSum;
+        }else{
+            logs = dao.query(LeiGuanLog.class, cnd, new Pager(pageNo, pageSize));
+            int stockSum = dao.count(LeiGuan.class, cnd);
+            recordResponse.setTotal(dao.count(LeiGuanLog.class, cnd));
+            cnd.and("use_time", ">", "0");
+            int useSum = dao.count(LeiGuan.class, cnd);
+            stock = stockSum - useSum;
+        }
         for (LeiGuanLog e : logs) {
             int count = e.getTo() - e.getFrom() + 1;
             if (e.getOperation().equals(StatusEnums.INIT.getDesc())) {
@@ -183,15 +198,8 @@ public class LeiGuanService {
                 e.setConsumed(count);
             }
         }
-
-            //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
-            cnd = Cnd.NEW();
-        cnd.and("storeTime", "<", end);
-        int stockSum = dao.count(LeiGuan.class, cnd);
-        cnd = Cnd.NEW();
-        cnd.and("use_time", "<", end);
-        int useSum = dao.count(LeiGuan.class, cnd);
-        recordResponse.setStock(stockSum-useSum);
+        recordResponse.setRecords(logs);
+        recordResponse.setStock(stock);
         return recordResponse;
     }
 }

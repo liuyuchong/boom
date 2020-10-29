@@ -357,13 +357,13 @@ method: GET
         "keeper": "刘玉冲",
         "consumer": "爆破人",
         "operator": "刘玉冲3",
-        "store": 6,
+        "store": 6,                   //入库数量
         "send": null,
         "back": null,
         "consumed": null
       }
       ],
-      "stock": 17,
+      "stock": 17,               //当日剩余库存
       "total": 6
     },
     "code": 0,
@@ -480,4 +480,33 @@ method: GET
 path: /api/zhayao/log
 method: GET
   参数：
+  @RequestParam Long date,
+  @RequestParam(required = false) Integer pageNo,
+  @RequestParam(required = false) Integer paseSize
   结果：
+  {
+  "data": {
+    "records": [{
+                  "id": 1,
+                  "date": 1603888559565,
+                  "operation": "入库",
+                  "batchNum": "batch1",
+                  "boxFrom": 624,
+                  "boxTo": 625,
+                  "colFrom": 0,
+                  "colTo": 18,
+                  "count": 24.0,
+                  "keeper": "领退人",
+                  "consumer": null,
+                  "operator": "admin",
+                  "store": 24.0,                 //入库数量
+                  "send": null,                  //发出数量
+                  "back": null,                   //退回数量
+                  "consumed": null               //使用数量
+                }],
+    "stock": 48,                //当日剩余库存
+    "total": 0
+  },
+  "code": 0,
+  "msg": "success"
+}

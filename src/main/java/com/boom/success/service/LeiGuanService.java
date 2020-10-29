@@ -102,7 +102,7 @@ public class LeiGuanService {
             leiGuan.setChildCode(i);
             list.add(leiGuan);
         }
-        List<LeiGuan> leiGuans = dao.insert(list);
+        List<LeiGuan> leiGuans = dao.fastInsert(list);
         return leiGuans.size();
     }
 

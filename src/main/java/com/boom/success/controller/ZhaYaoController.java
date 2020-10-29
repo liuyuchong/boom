@@ -139,18 +139,11 @@ public class ZhaYaoController {
     /**
      * 按日期查账单
      */
-    @RequestMapping(value = "/api/ZhaYao/log", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/zhayao/log", method = RequestMethod.GET)
     public Result<ZhaYaoRecordResponse> getLog(@RequestParam Long date,
                                                @RequestParam(required = false) Integer pageNo,
                                                @RequestParam(required = false) Integer paseSize) {
         return Result.success(service.getLog(date, pageNo, paseSize));
     }
 
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 28);
-        System.out.println(calendar.getTimeInMillis());
-
-        System.out.println(new Date(1603888559565L));
-    }
 }

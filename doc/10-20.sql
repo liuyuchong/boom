@@ -144,12 +144,12 @@ CREATE TABLE `boom`.`boom_detail`  (
   `child_code` int(20) NOT NULL COMMENT '雷管子码',
   `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '炸药批次号',
   `box_num` int(20) NOT NULL COMMENT '炸药箱号',
-  `col_num` int(20) NOT NULL COMMENT '炸药柱码',
+  `col_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '炸药柱码',
   `count` float(20, 1) NOT NULL COMMENT '炸药总重量',
   `down` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '下药工',
   `packager` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '包药工',
   `mark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
-  `videos` json NOT NULL COMMENT '视频链接',
+  `videos` json NULL COMMENT '视频链接',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 SET FOREIGN_KEY_CHECKS = 1;

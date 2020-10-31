@@ -153,6 +153,16 @@ public class LeiGuanService {
         return dao.query(LeiGuan.class, cnd);
     }
 
+    public LeiGuan queryByCode(String fixCode, Integer childCode) {
+        if (StringUtils.isEmpty(fixCode)) {
+            return null;
+        }
+        if (childCode == null || childCode < 0) {
+            return null;
+        }
+        return dao.fetch(LeiGuan.class, Cnd.where("fix_code", "=", fixCode).and("child_code", "=", childCode));
+    }
+
     public LeiguanRecordResponse getLog(Long time, Integer pageNo, Integer pageSize) {
         if (pageNo==null||pageNo <= 0) {
             pageNo = 1;

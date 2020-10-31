@@ -109,12 +109,10 @@ private Integer id;
 private String group;
 private String position;
 private String phoneNumber;
-/**
 * @see RoleEnums
 * ADMIN(1,"系统管理员"),
 * WORD(2,"读写权限"),
 * GUEST(3,"只读权限");
-*/
 private Integer role;
 结果：
 {
@@ -510,3 +508,151 @@ method: GET
   "code": 0,
   "msg": "success"
 }
+
+----------------耗材明细接口--------------------
+1. 新增明细
+path: /api/detail
+method: POST
+参数：
+      "date": 1120,                          //日期
+      "lineNum": 0,                           //线束号
+      "stakeNum": "580021",                    //桩号
+      "height": 3,                             //井深
+      "fixCode": "152011",                    //雷管固定码
+      "childCode": 11,                        //雷管发码
+      "batchNum": "batch1",                   //炸药批次号
+      "boxNum": 1266,                         //炸药箱号
+      "colNum": "2-3",                        //炸药柱码 如 2-3 4-6等
+      "count": 2.0,                           //炸药重量  系统计算 不让用户填写
+      "down": "下药工姓名",                    //下药工姓名
+      "packager": "包药工姓名",                 //包药工姓名
+      "mark": "备注",                            //备注 选填
+      "videos": {                               //视频相关链接
+        "guardVideo": "警卫班视频url",
+        "sendVideo": "交接发放视频url",
+        "packageVideo": "包药视频url",
+        "useVideo": "下药视频url",
+        "badVideo": "废盲炮视频url"
+      }
+    }
+结果：
+  {
+    "data": {
+      "id": 3,
+      "date": 1120,
+      "lineNum": 0,
+      "stakeNum": "580021",
+      "height": 3,
+      "fixCode": "152011",
+      "childCode": 11,
+      "batchNum": "batch1",
+      "boxNum": 1266,
+      "colNum": "2-3",
+      "count": 2.0,
+      "down": "下药工姓名",
+      "packager": "包药工姓名",
+      "mark": "备注",
+      "videos": {
+        "guardVideo": "警卫班视频url",
+        "sendVideo": "交接发放视频url",
+        "packageVideo": "包药视频url",
+        "useVideo": "下药视频url",
+        "badVideo": "废盲炮视频url"
+      }
+    },
+    "code": 0,
+    "msg": "success"
+  }
+
+2. 更新耗材明细接口
+path: /api/detail
+method: PUT
+参数：
+  {
+    "id":1,
+    "date":1120,
+    "lineNum":0,
+    "stakeNum":"580021",
+    "height":3,
+    "fixCode":152010,
+    "childCode":1,
+    "batchNum":"batch1",
+    "boxNum":1266,
+    "colNum":"1-3",
+    "down":"下药工姓名",
+    "packager":"包药工姓名",
+    "mark":"备注",
+    "videos":{
+      "guardVideo": "警卫班视频url",
+      "sendVideo": "交接发放视频url",
+      "packageVideo": "包药视频url",
+      "useVideo": "下药视频url",
+      "badVideo": "废盲炮视频url"
+    }
+  }
+结果：
+  {
+    "data": {
+      "id": 1,
+      "date": 1120,
+      "lineNum": 0,
+      "stakeNum": "580021",
+      "height": 3,
+      "fixCode": "152010",
+      "childCode": 1,
+      "batchNum": "batch1",
+      "boxNum": 1266,
+      "colNum": "1-3",
+      "count": 2.0,
+      "down": "下药工姓名",
+      "packager": "包药工姓名",
+      "mark": "备注",
+      "videos": {
+        "guardVideo": "警卫班视频url",
+        "sendVideo": "交接发放视频url",
+        "packageVideo": "包药视频url",
+        "useVideo": "下药视频url",
+        "badVideo": "废盲炮视频url"
+      }
+    },
+    "code": 0,
+    "msg": "success"
+  }
+
+3. 更新视频接口
+path：/api/video/update
+method: POST
+参数：
+  {
+    "detailId":2,
+    "type":5,
+    "url":"测试地址5"
+  }
+结果：
+  {
+    "data": {
+      "id": 2,
+      "date": 1120,
+      "lineNum": 0,
+      "stakeNum": "580021",
+      "height": 3,
+      "fixCode": "152011",
+      "childCode": 11,
+      "batchNum": "batch1",
+      "boxNum": 1266,
+      "colNum": "2-3",
+      "count": 2.0,
+      "down": "下药工姓名",
+      "packager": "包药工姓名",
+      "mark": "备注",
+      "videos": {
+        "guardVideo": "测试地址",
+        "sendVideo": "测试地址2",
+        "packageVideo": null,
+        "useVideo": null,
+        "badVideo": "测试地址5"
+      }
+    },
+    "code": 0,
+    "msg": "success"
+  }

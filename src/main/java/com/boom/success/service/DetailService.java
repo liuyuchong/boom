@@ -13,14 +13,20 @@ public class DetailService {
     @Autowired
     private Dao dao;
 
-    public void insert(Detail detail) {
-        dao.insert(detail);
+    public Detail insert(Detail detail) {
+        return dao.insert(detail);
+    }
+
+    public Detail getById(Long id) {
+        return dao.fetch(Detail.class, id);
     }
 
     public int update(Detail detail) {
         return dao.update(detail);
     }
 
-    public List<Detail> query()
+    public List<Detail> query() {
+        return null;
+    }
 
 }

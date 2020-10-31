@@ -4,7 +4,7 @@ import lombok.Data;
 import org.nutz.dao.entity.annotation.*;
 
 @Data
-@Table("detail")
+@Table("boom_detail")
 public class Detail {
     @Id
     private Long id;
@@ -25,7 +25,7 @@ public class Detail {
     private String fixCode;
 
     @Column("child_code")
-    private String childCode;
+    private Integer childCode;
 
     @Column("batch_num")
     private String batchNum;
@@ -34,7 +34,7 @@ public class Detail {
     private Integer boxNum;
 
     @Column("col_num")
-    private Integer colNum;
+    private String colNum;
 
     @Column
     private Float count;

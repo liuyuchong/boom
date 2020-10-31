@@ -122,7 +122,7 @@ public class ZhaYaoService {
     /**
      * 批量修改前 检查是否已存在炸药信息
      */
-    public Result checkIfExist2(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo) {
+    public Result<Double> checkIfExist2(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo) {
         List<ZhaYao> zhaYaos = getZhaYaoList(batchNum, boxFrom, boxTo, colFrom, colTo);
         if (CollectionUtils.isEmpty(zhaYaos)) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "炸药信息不存在");

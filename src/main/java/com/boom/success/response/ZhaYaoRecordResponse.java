@@ -1,6 +1,5 @@
 package com.boom.success.response;
 
-import com.boom.success.bo.LeiGuanLog;
 import com.boom.success.bo.ZhaYaoLog;
 import lombok.Data;
 

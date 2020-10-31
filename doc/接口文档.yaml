@@ -656,3 +656,50 @@ method: POST
     "code": 0,
     "msg": "success"
   }
+
+4. 耗材列表查询
+path: /api/detail/query
+method： GET
+参数：
+  @RequestParam(required = false) Long date,               //日期
+  @RequestParam(required = false) Integer lineNum,         //线束号
+  @RequestParam(required = false) String stakeNum,         //桩号
+  @RequestParam(required = false) String fixCode,          //雷管固定码
+  @RequestParam(required = false) Integer childCode,       //雷管发码
+  @RequestParam(required = false) String batchNum,         //炸药批次号
+  @RequestParam(required = false) Integer boxNum,          //炸药箱号
+  @RequestParam(required = false) Integer pageNo,          //第几页
+  @RequestParam(required = false) Integer pageSize         //每页多少行
+结果：
+  {
+    "data": {
+      "total": 1,
+      "detailList": [
+      {
+        "id": 1,
+        "date": 1604172246915,
+        "lineNum": 0,
+        "stakeNum": "580021",
+        "height": 3,
+        "fixCode": "152010",
+        "childCode": 1,
+        "batchNum": "batch1",
+        "boxNum": 1,
+        "colNum": "1-3",
+        "count": 2.0,
+        "down": "下药工姓名",
+        "packager": "包药工姓名",
+        "mark": "备注",
+        "videos": {
+          "guardVideo": "警卫班视频url",
+          "sendVideo": "交接发放视频url",
+          "packageVideo": "包药视频url",
+          "useVideo": "下药视频url",
+          "badVideo": "废盲炮视频url"
+        }
+      }
+      ]
+    },
+    "code": 0,
+    "msg": "success"
+  }

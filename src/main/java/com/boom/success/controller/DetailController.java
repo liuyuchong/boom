@@ -28,8 +28,16 @@ public class DetailController {
     private ZhaYaoService zhaYaoService;
 
     @RequestMapping(value = "/api/detail/query", method = RequestMethod.GET)
-    public Result<DetailResponse> query(@RequestParam(required = false) Integer pageNo) {
-        return null;
+    public Result<DetailResponse> query(@RequestParam(required = false) Long date,
+                                        @RequestParam(required = false) Integer lineNum,
+                                        @RequestParam(required = false) String stakeNum,
+                                        @RequestParam(required = false) String fixCode,
+                                        @RequestParam(required = false) Integer childCode,
+                                        @RequestParam(required = false) String batchNum,
+                                        @RequestParam(required = false) Integer boxNum,
+                                        @RequestParam(required = false) Integer pageNo,
+                                        @RequestParam(required = false) Integer pageSize) {
+        return Result.success(detailService.query(date, lineNum, stakeNum, fixCode, childCode, batchNum, boxNum, pageNo, pageSize));
     }
 
     /**

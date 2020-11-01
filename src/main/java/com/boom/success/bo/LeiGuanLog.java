@@ -44,13 +44,4 @@ public class LeiGuanLog {
     //操作人
     @Column
     private String operator;
-
-    //入库
-    private Integer store;
-    //发出
-    private Integer send;
-    //回退
-    private Integer back;
-    //使用
-    private Integer consumed;
 }

@@ -2,15 +2,18 @@ package com.boom.success.service;
 
 import com.boom.success.bo.Detail;
 import com.boom.success.request.DetailResponse;
+import com.boom.success.response.bo.DetailBo;
 import com.boom.success.util.TimeUtil;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.OrderBy;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,11 +71,16 @@ public class DetailService {
         int total = dao.count(Detail.class, cnd);
         DetailResponse detailResponse = new DetailResponse();
         detailResponse.setTotal(total);
-        detailResponse.setDetailList(list);
+        List<DetailBo> detailBos = new ArrayList<>();
+        detailResponse.setDetailList(detailBos);
+        for (Detail e : list) {
+            DetailBo bo = new DetailBo();
+            BeanUtils.copyProperties(e, bo);
+            bo.setChildCode(String.format("%05d", e.getChildCode()));
+            bo.setBoxNum(String.format("%02d", e.getBoxNum()));
+            detailBos.add(bo);
+        }
         return detailResponse;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Date().getTime());
-    }
 }

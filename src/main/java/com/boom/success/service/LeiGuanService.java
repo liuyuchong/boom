@@ -8,12 +8,15 @@ import com.boom.success.consts.StatusEnums;
 import com.boom.success.request.LeiGuanBatchRequest;
 import com.boom.success.response.LeiGuanResponse;
 import com.boom.success.response.LeiguanRecordResponse;
+import com.boom.success.response.bo.LeiGuanBo;
+import com.boom.success.response.bo.LeiGuanLogBo;
 import com.boom.success.util.TimeUtil;
 import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.OrderBy;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -66,7 +69,14 @@ public class LeiGuanService {
         int total = dao.count(LeiGuan.class, cnd);
         LeiGuanResponse leiGuanResponse = new LeiGuanResponse();
         leiGuanResponse.setTotal(total);
-        leiGuanResponse.setLeiGuanList(list);
+        List<LeiGuanBo> leiGuanBos = new ArrayList<>();
+        leiGuanResponse.setLeiGuanList(leiGuanBos);
+        for (LeiGuan e : list) {
+            LeiGuanBo bo = new LeiGuanBo();
+            BeanUtils.copyProperties(e, bo);
+            bo.setChildCode(String.format("%05d", e.getChildCode()));
+            leiGuanBos.add(bo);
+        }
         return leiGuanResponse;
     }
 
@@ -195,19 +205,25 @@ public class LeiGuanService {
             int useSum = dao.count(LeiGuan.class, cnd);
             stock = stockSum - useSum;
         }
+        List<LeiGuanLogBo> leiGuanLogBos = new ArrayList<>();
         for (LeiGuanLog e : logs) {
+            LeiGuanLogBo bo = new LeiGuanLogBo();
+            BeanUtils.copyProperties(e, bo);
             int count = e.getTo() - e.getFrom() + 1;
             if (e.getOperation().equals(StatusEnums.INIT.getDesc())) {
-                e.setStore(count);
+                bo.setStore(count);
             }else if (e.getOperation().equals(StatusEnums.ON_GOING.getDesc())) {
-                e.setSend(count);
+                bo.setSend(count);
             }else if (e.getOperation().equals(StatusEnums.BACK.getDesc())) {
-                e.setBack(count);
+                bo.setBack(count);
             }else if (e.getOperation().equals(StatusEnums.CONSUMED.getDesc())) {
-                e.setConsumed(count);
+                bo.setConsumed(count);
             }
+            bo.setFrom(String.format("%05d", e.getFrom()));
+            bo.setTo(String.format("%05d", e.getTo()));
+            leiGuanLogBos.add(bo);
         }
-        recordResponse.setRecords(logs);
+        recordResponse.setRecords(leiGuanLogBos);
         recordResponse.setStock(stock);
         return recordResponse;
     }

@@ -9,12 +9,15 @@ import com.boom.success.consts.StatusEnums;
 import com.boom.success.request.ZhaYaoBatchRequest;
 import com.boom.success.response.ZhaYaoRecordResponse;
 import com.boom.success.response.ZhaYaoResponse;
+import com.boom.success.response.bo.ZhaYaoBo;
+import com.boom.success.response.bo.ZhaYaoLogBo;
 import com.boom.success.util.TimeUtil;
 import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.OrderBy;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +66,15 @@ public class ZhaYaoService {
         int total = dao.count(ZhaYao.class, cnd);
         ZhaYaoResponse zhaYaoResponse = new ZhaYaoResponse();
         zhaYaoResponse.setTotal(total);
-        zhaYaoResponse.setZhaYaoList(list);
+        List<ZhaYaoBo> zhaYaoBos = new ArrayList<>();
+        zhaYaoResponse.setZhaYaoList(zhaYaoBos);
+        for (ZhaYao e : list) {
+            ZhaYaoBo bo = new ZhaYaoBo();
+            BeanUtils.copyProperties(e, bo);
+            bo.setBoxNum(String.format("%04d", e.getBoxNum()));
+            bo.setColNum(String.format("%02d", e.getColNum()));
+            zhaYaoBos.add(bo);
+        }
         return zhaYaoResponse;
     }
 
@@ -178,11 +189,13 @@ public class ZhaYaoService {
         List<ZhaYaoLog> logs;
         Cnd cnd = Cnd.NEW();
         int stock;
+        int total;
         if (time != null) {
             long start = TimeUtil.getStart(time);
             long end = TimeUtil.getEnd(time);
             cnd.and("date", ">=", start).and("date", "<=", end);
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
+            total = dao.count(ZhaYaoLog.class, cnd);
             recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
             //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
             cnd = Cnd.NEW();
@@ -194,6 +207,7 @@ public class ZhaYaoService {
             stock = stockSum - useSum;
         }else{
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
+            total = dao.count(ZhaYaoLog.class, cnd);
             int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
             cnd = Cnd.NEW();
             cnd.and("use_time", ">", 0);
@@ -201,20 +215,29 @@ public class ZhaYaoService {
             stock = stockSum - useSum;
         }
 
+        List<ZhaYaoLogBo> zhaYaoLogBos = new ArrayList<>();
         for (ZhaYaoLog e : logs) {
+            ZhaYaoLogBo bo = new ZhaYaoLogBo();
+            BeanUtils.copyProperties(e, bo);
             float count = e.getCount();
             if (e.getOperation().equals(StatusEnums.INIT.getDesc())) {
-                e.setStore(count);
+                bo.setStore(count);
             } else if (e.getOperation().equals(StatusEnums.ON_GOING.getDesc())) {
-                e.setSend(count);
+                bo.setSend(count);
             } else if (e.getOperation().equals(StatusEnums.BACK.getDesc())) {
-                e.setBack(count);
+                bo.setBack(count);
             } else if (e.getOperation().equals(StatusEnums.CONSUMED.getDesc())) {
-                e.setConsumed(count);
+                bo.setConsumed(count);
             }
+            bo.setBoxFrom(String.format("%04d", e.getBoxFrom()));
+            bo.setBoxTo(String.format("%04d", e.getBoxTo()));
+            bo.setColFrom(String.format("%02d", e.getColFrom()));
+            bo.setColTo(String.format("%02d", e.getColTo()));
+            zhaYaoLogBos.add(bo);
         }
 
-        recordResponse.setRecords(logs);
+        recordResponse.setTotal(total);
+        recordResponse.setRecords(zhaYaoLogBos);
         recordResponse.setStock(stock);
         return recordResponse;
     }

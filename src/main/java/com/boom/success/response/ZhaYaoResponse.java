@@ -1,12 +1,13 @@
 package com.boom.success.response;
 
 import com.boom.success.bo.ZhaYao;
+import com.boom.success.response.bo.ZhaYaoBo;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class ZhaYaoResponse {
-    private List<ZhaYao> zhaYaoList;
+    private List<ZhaYaoBo> zhaYaoList;
     private int total;
 }

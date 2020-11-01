@@ -56,13 +56,4 @@ public class ZhaYaoLog {
     //操作人
     @Column
     private String operator;
-
-    //入库
-    private Float store;
-    //发出
-    private Float send;
-    //回退
-    private Float back;
-    //使用
-    private Float consumed;
 }

@@ -18,19 +18,6 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for boom_detail
--- ----------------------------
-DROP TABLE IF EXISTS `boom_detail`;
-CREATE TABLE `boom_detail`  (
-  `id` int(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键id',
-  `project_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '项目名',
-  `line_num` int(20) NOT NULL COMMENT '线束号',
-  `stake_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '炮排号/桩号',
-  `hight` int(20) NOT NULL COMMENT '井深',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
 -- Table structure for leiguan_info
 -- ----------------------------
 DROP TABLE IF EXISTS `leiguan_info`;
@@ -153,3 +140,9 @@ CREATE TABLE `boom`.`boom_detail`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+INSERT INTO `boom`.`boom_detail`(`id`, `date`, `line_num`, `stake_num`, `height`, `fix_code`, `child_code`, `batch_num`, `box_num`, `col_num`, `count`, `down`, `packager`, `mark`, `videos`) VALUES (1, 1604172246915, 0, '580021', 3, '152010', 1, 'batch1', 1, '1-3', 2.0, '下药工姓名', '包药工姓名', '备注', '{\"badVideo\": \"废盲炮视频url\", \"useVideo\": \"下药视频url\", \"sendVideo\": \"交接发放视频url\", \"guardVideo\": \"警卫班视频url\", \"packageVideo\": \"包药视频url\"}');
+INSERT INTO `boom`.`boom_detail`(`id`, `date`, `line_num`, `stake_num`, `height`, `fix_code`, `child_code`, `batch_num`, `box_num`, `col_num`, `count`, `down`, `packager`, `mark`, `videos`) VALUES (2, 1604172246915, 1, '580022', 3, '152011', 2, 'batch1', 2, '2-3', 2.0, '下药工姓名', '包药工姓名', '备注', '{\"badVideo\": \"测试地址5\", \"useVideo\": null, \"sendVideo\": \"测试地址2\", \"guardVideo\": \"测试地址\", \"packageVideo\": null}');
+INSERT INTO `boom`.`boom_detail`(`id`, `date`, `line_num`, `stake_num`, `height`, `fix_code`, `child_code`, `batch_num`, `box_num`, `col_num`, `count`, `down`, `packager`, `mark`, `videos`) VALUES (3, 1604172246915, 2, '580023', 3, '152012', 3, 'batch1', 3, '2-3', 2.0, '下药工姓名', '包药工姓名', '备注', '{\"badVideo\": \"废盲炮视频url\", \"useVideo\": \"下药视频url\", \"sendVideo\": \"交接发放视频url\", \"guardVideo\": \"警卫班视频url\", \"packageVideo\": \"包药视频url\"}');

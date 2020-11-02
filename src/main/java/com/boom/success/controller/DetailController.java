@@ -182,7 +182,7 @@ public class DetailController {
             //炸药信息检查
             Result<Double> zhaYaoInfo = checkZhaYao(oldDetail.getBatchNum(), oldDetail.getBoxNum(), oldDetail.getColNum());
             if (zhaYaoInfo.getCode() != GeneralCode.SUCCESS.getCode()) {
-                return Result.fail(zhaYaoInfo.getCode(), "炸药信息不存在！");
+                return Result.fail(zhaYaoInfo.getCode(), zhaYaoInfo.getMsg());
             }
             detail.setCount(zhaYaoInfo.getData().floatValue());
         }

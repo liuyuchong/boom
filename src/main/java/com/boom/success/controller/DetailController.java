@@ -132,6 +132,9 @@ public class DetailController {
             if (detailService.existZhayao(batchNum, boxNum, toFormat)) {
                 return Result.fail(GeneralCode.Param_Error.getCode(), "炸药已被使用！");
             }
+        }else{
+            //如果没有填写to 那么应该只计算单柱炸药而不是计算范围
+            to = from;
         }
 
 

@@ -83,4 +83,15 @@ public class DetailService {
         return detailResponse;
     }
 
+    public boolean existLeiguan(String fixCode, int childCode) {
+        String childCodeFor = String.format("%05d", childCode);
+        Detail detail = dao.fetch(Detail.class, Cnd.where("fix_code", "=", fixCode).and("child_code", "=", childCodeFor));
+        return detail != null;
+    }
+
+    public boolean existZhayao(String batchNum, int boxNum, String col) {
+        Detail detail = dao.fetch(Detail.class, Cnd.where("batch_num", "=", batchNum).and("box_num", "=", boxNum).and("col_num", "like", "%"+col+"%"));
+        return detail != null;
+    }
+
 }

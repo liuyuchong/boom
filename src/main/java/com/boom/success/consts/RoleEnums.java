@@ -12,6 +12,10 @@ public enum RoleEnums {
         this.desc = desc;
     }
 
+    public int getCode() {
+        return code;
+    }
+
     public static RoleEnums getRole(Integer code) {
         if (code == null) {
             return null;

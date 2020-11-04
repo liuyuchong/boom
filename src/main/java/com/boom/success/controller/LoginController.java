@@ -43,6 +43,7 @@ public class LoginController {
             return result;
         }
         httpServletRequest.getSession().setAttribute("username", request.getUsername());
+        httpServletRequest.getSession().setAttribute("role", result.getData().getRole());
         return result;
     }
 

@@ -86,7 +86,7 @@ public class DetailController {
         }
 
         //炸药信息检查
-        Result<Double> zhaYaoInfo = checkZhaYao(detail.getBatchNum(), detail.getBoxNum(), detail.getColNum());
+        Result<Double> zhaYaoInfo = checkZhaYao(detail);
         if (zhaYaoInfo.getCode() != GeneralCode.SUCCESS.getCode()) {
             return Result.fail(zhaYaoInfo.getCode(), zhaYaoInfo.getMsg());
         }
@@ -97,13 +97,18 @@ public class DetailController {
         if (leiGuan == null) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "雷管信息不存在！");
         }
+        if (detailService.existLeiguan(detail.getFixCode(), detail.getChildCode())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "雷管已被使用！");
+        }
 
-        // TODO: 2020/10/31 炸药雷管可用性检查
         return Result.success(detailService.insert(detail));
     }
 
-    private Result<Double> checkZhaYao(String batchNum, Integer boxNum, String colNum) {
-         String[] colNums = colNum.split("-");
+    private Result<Double> checkZhaYao(Detail detail) {
+        String batchNum = detail.getBatchNum();
+        String colNum = detail.getColNum();
+        int boxNum = detail.getBoxNum();
+        String[] colNums = colNum.split("-");
         Integer from;
         Integer to = null;
         try {
@@ -114,6 +119,25 @@ public class DetailController {
         } catch (Exception e) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的炸药柱码信息，如2-3");
         }
+
+        String fromFormat = String.format("%02d", from);
+        if (detailService.existZhayao(batchNum, boxNum, fromFormat)) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "炸药已被使用！");
+        }
+        detail.setColNum(fromFormat);
+
+        if (to != null) {
+            String toFormat = String.format("%02d", to);
+            detail.setColNum(fromFormat + "-" + toFormat);
+            if (detailService.existZhayao(batchNum, boxNum, toFormat)) {
+                return Result.fail(GeneralCode.Param_Error.getCode(), "炸药已被使用！");
+            }
+        }else{
+            //如果没有填写to 那么应该只计算单柱炸药而不是计算范围
+            to = from;
+        }
+
+
         return zhaYaoService.checkIfExist2(batchNum, boxNum, boxNum, from, to);
     }
 
@@ -180,7 +204,7 @@ public class DetailController {
         }
         if (updateZhaYaoInfo) {
             //炸药信息检查
-            Result<Double> zhaYaoInfo = checkZhaYao(oldDetail.getBatchNum(), oldDetail.getBoxNum(), oldDetail.getColNum());
+            Result<Double> zhaYaoInfo = checkZhaYao(oldDetail);
             if (zhaYaoInfo.getCode() != GeneralCode.SUCCESS.getCode()) {
                 return Result.fail(zhaYaoInfo.getCode(), zhaYaoInfo.getMsg());
             }

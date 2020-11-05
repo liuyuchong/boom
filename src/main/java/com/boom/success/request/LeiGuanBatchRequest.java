@@ -17,11 +17,23 @@ public class LeiGuanBatchRequest {
     //固定码
     private String fixCode;
 
-    //发码起始值(含)
-    private Integer from;
+    //发码1起始值(含)
+    private Integer from1;
 
-    //发码终止值(含)
-    private Integer to;
+    //发码1终止值(含)
+    private Integer to1;
+
+    //发码2起始值(含)
+    private Integer from2;
+
+    //发码2终止值(含)
+    private Integer to2;
+
+    //发码3起始值(含)
+    private Integer from3;
+
+    //发码3终止值(含)
+    private Integer to3;
 
     //保管人
     private String keeper;

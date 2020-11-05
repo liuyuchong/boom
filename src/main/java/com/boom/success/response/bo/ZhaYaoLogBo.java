@@ -11,10 +11,8 @@ public class ZhaYaoLogBo {
     private Long date;
     private String operation;
     private String batchNum;
-    private String boxFrom;
-    private String boxTo;
-    private String colFrom;
-    private String colTo;
+    private String box;
+    private String col;
     private String keeper;
     private String consumer;
     private String operator;
@@ -25,6 +23,4 @@ public class ZhaYaoLogBo {
     private Float send;
     //回退
     private Float back;
-    //使用
-    private Float consumed;
 }

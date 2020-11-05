@@ -25,21 +25,14 @@ public class ZhaYaoLog {
     @Column("batch_num")
     private String batchNum;
 
-    //箱号起始值
-    @Column("box_from")
-    private Integer boxFrom;
+    //箱号
+    @Column("box")
+    private String box;
 
-    //箱号结束值
-    @Column("box_to")
-    private Integer boxTo;
+    //柱号
+    @Column("col")
+    private String col;
 
-    //柱号起始值
-    @Column("col_from")
-    private Integer colFrom;
-
-    //柱号结束值
-    @Column("col_to")
-    private Integer colTo;
 
     //操作数量(kg)
     @Column

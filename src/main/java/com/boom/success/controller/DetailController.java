@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+
 @RestController
 public class DetailController {
 
@@ -264,5 +267,50 @@ public class DetailController {
         oldDetail.setVideos(videos);
         detailService.update(oldDetail);
         return Result.success(oldDetail);
+    }
+
+
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    public void downloadFile(HttpServletResponse response) {
+        //这里文件名称是通过参数传递过来的，要是不需要，直接可以写在这里。String fileName = "a.doc";
+//        String path = "C:\\Users\\Administrator\\Desktop\\a.txt";  //这里指定路径在C盘根目录，按需改动即可
+//        byte[] buffer = new byte[1024];
+        byte[] buffer = "test".getBytes();
+        FileInputStream fis = null;
+//        BufferedInputStream bis = null;
+        try {
+//            File file = new File(path, fileName);
+            response.setContentType("application/x-download");
+            response.addHeader("Content-Disposition", "attachment;filename=detail.txt");
+//            fis = new FileInputStream(file);
+//            bis = new BufferedInputStream(fis);
+            OutputStream os = response.getOutputStream();
+//            int i = bis.read(buffer);
+//            while (i != -1) {
+                os.write(buffer);
+//                i = bis.read(buffer);
+//            }
+        }catch(FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("The file not found!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+//            if (bis != null) {
+//                try {
+//                    bis.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

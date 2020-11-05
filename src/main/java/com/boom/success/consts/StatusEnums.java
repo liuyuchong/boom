@@ -3,8 +3,7 @@ package com.boom.success.consts;
 public enum StatusEnums {
     INIT(1,"入库"),
     ON_GOING(2,"发出"),
-    BACK(3,"退回"),
-    CONSUMED(4,"已使用");
+    BACK(3,"退回");
     private int code;
     private String desc;
 

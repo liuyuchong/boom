@@ -10,6 +10,7 @@ import com.boom.success.response.LeiGuanResponse;
 import com.boom.success.response.LeiguanRecordResponse;
 import com.boom.success.service.LeiGuanService;
 import com.boom.success.util.LoginUtil;
+import com.boom.success.util.NumberCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +39,11 @@ public class LeiGuanController {
                                                  @RequestParam(required = false) Integer from,
                                                  @RequestParam(required = false) Integer to,
                                                  @RequestParam(required = false) Integer status,
+                                                 @RequestParam(required = false) String keeper,
+                                                 @RequestParam(required = false) String consumer,
                                                  @RequestParam(required = false) Integer pageNo,
                                                  @RequestParam(required = false) Integer pageSize) {
-        return Result.success(service.query(fixCode, childCode, from, to, status, pageNo, pageSize));
+        return Result.success(service.query(fixCode, childCode, from, to, status, keeper, consumer, pageNo, pageSize));
     }
 
 
@@ -74,13 +77,31 @@ public class LeiGuanController {
         if (StringUtils.isEmpty(request.getFixCode())) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "请填写固定码");
         }
-        if (request.getFrom() == null || request.getFrom() < 0) {
-            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的发码起始值");
+        if (request.getFrom1() != null && request.getFrom1() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
         }
-        if (request.getTo() == null || request.getTo() < 0) {
-            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的发码终止值");
+        if (request.getFrom2() != null && request.getFrom2() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
         }
-        if (request.getTo() < request.getFrom()) {
+        if (request.getFrom3() != null && request.getFrom3() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
+        }
+        if (request.getTo1() != null && request.getTo1() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
+        }
+        if (request.getTo2() != null && request.getTo2() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
+        }
+        if (request.getTo3() != null && request.getTo3() < 0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写正确的雷管发码");
+        }
+        if ((request.getFrom1() != null && request.getTo1() != null) && (request.getFrom1() > request.getTo1())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "终止值必须大于等于起始值");
+        }
+        if ((request.getFrom2() != null && request.getTo2() != null) && (request.getFrom2() > request.getTo2())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "终止值必须大于等于起始值");
+        }
+        if ((request.getFrom3() != null && request.getTo3() != null) && (request.getFrom3() > request.getTo3())) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "终止值必须大于等于起始值");
         }
         if (request.getOptType().intValue() == StatusEnums.INIT.getCode() && StringUtils.isEmpty(request.getKeeper())) {
@@ -89,40 +110,61 @@ public class LeiGuanController {
         if (request.getOptType().intValue() != StatusEnums.INIT.getCode() && StringUtils.isEmpty(request.getConsumer())) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "请填写领退人");
         }
+        //交叉校验
+        if (NumberCheck.in(request.getFrom1(), request.getFrom2(), request.getTo2())||NumberCheck.in(request.getFrom1(), request.getFrom3(), request.getTo3())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+        if (NumberCheck.in(request.getTo1(), request.getFrom2(), request.getTo2())||NumberCheck.in(request.getTo1(), request.getFrom3(), request.getTo3())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+        if (NumberCheck.in(request.getFrom2(), request.getFrom1(), request.getTo1())||NumberCheck.in(request.getFrom2(), request.getFrom3(), request.getTo3())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+        if (NumberCheck.in(request.getTo2(), request.getFrom1(), request.getTo1())||NumberCheck.in(request.getTo2(), request.getFrom3(), request.getTo3())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+        if (NumberCheck.in(request.getFrom3(), request.getFrom2(), request.getTo2())||NumberCheck.in(request.getFrom3(), request.getFrom1(), request.getTo1())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+        if (NumberCheck.in(request.getTo3(), request.getFrom2(), request.getTo2())||NumberCheck.in(request.getTo3(), request.getFrom1(), request.getTo1())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "数值不能交叉");
+        }
+
         int count = 0;
         switch (statusEnums) {
             case INIT:
                 //入库，检查固定码对应的发码是否已存在
-                Result result = service.checkIfExist(request.getFixCode(), request.getFrom(), request.getTo());
+                Result result = service.checkIfExist(request.getFixCode(), request.getFrom1(), request.getTo1());
                 if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
                     return result;
                 }
-                count = service.batchInsert(request);
+                result = service.checkIfExist(request.getFixCode(), request.getFrom2(), request.getTo2());
+                if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+                    return result;
+                }
+                result = service.checkIfExist(request.getFixCode(), request.getFrom3(), request.getTo3());
+                if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+                    return result;
+                }
+                count = service.batchInsert(request,username);
                 break;
             default:
                 //检查对应的固定码 发码是否存在
-                result = service.checkIfExist2(request.getFixCode(), request.getFrom(), request.getTo());
+                result = service.checkIfExist2(request.getFixCode(), request.getFrom1(), request.getTo1());
                 if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
                     return result;
                 }
-                count = service.batchUpdate(request);
+                result = service.checkIfExist2(request.getFixCode(), request.getFrom2(), request.getTo2());
+                if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+                    return result;
+                }
+                result = service.checkIfExist2(request.getFixCode(), request.getFrom2(), request.getTo2());
+                if (result.getCode() != GeneralCode.SUCCESS.getCode()) {
+                    return result;
+                }
+                count = service.batchUpdate(request,username);
         }
 
-        //计入批量操作日志
-        LeiGuanLog log = new LeiGuanLog();
-        log.setDate(request.getDate());
-        log.setOperator(username);
-        log.setOperation(statusEnums.getDesc());
-        log.setFixCode(request.getFixCode());
-        log.setFrom(request.getFrom());
-        log.setTo(request.getTo());
-        if (request.getKeeper() != null) {
-            log.setKeeper(request.getKeeper());
-        }
-        if (request.getConsumer() != null) {
-            log.setConsumer(request.getConsumer());
-        }
-        service.insertLog(log);
         return Result.success(count);
     }
 
@@ -130,10 +172,13 @@ public class LeiGuanController {
      * 按日期查账单
      */
     @RequestMapping(value = "/api/leiguan/log", method = RequestMethod.GET)
-    public Result<LeiguanRecordResponse> getLog(@RequestParam Long date,
+    public Result<LeiguanRecordResponse> getLog(@RequestParam(required = false) Long startTime,
+                                                @RequestParam(required = false) Long endTime,
+                                                @RequestParam(required = false) String keeper,
+                                                @RequestParam(required = false) String consumer,
                                                 @RequestParam(required = false) Integer pageNo,
                                                 @RequestParam(required = false) Integer paseSize) {
-        return Result.success(service.getLog(date, pageNo, paseSize));
+        return Result.success(service.getLog(startTime, endTime, keeper, consumer, pageNo, paseSize));
     }
 
 }

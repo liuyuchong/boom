@@ -16,14 +16,24 @@ public class ZhaYaoBatchRequest {
     //批次号
     private String batchNum;
     //箱号起始值
-    private Integer boxFrom;
+    private Integer boxFrom1;
+    private Integer boxFrom2;
+    private Integer boxFrom3;
     //箱号结束值
-    private Integer boxTo;
+    private Integer boxTo1;
+    private Integer boxTo2;
+    private Integer boxTo3;
     //炸药规格
     /**
      * @see StandardsEnums
      */
-    private Integer type;
+    private Integer type1;
+    private Integer type2;
+    private Integer type3;
+    //整装箱号
+    private String box;
+    //散装箱号 柱号
+    private Integer sbox;
     //柱号起始值
     private Integer colFrom;
     //柱号结束值

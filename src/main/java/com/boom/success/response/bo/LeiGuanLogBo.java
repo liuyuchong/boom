@@ -22,6 +22,4 @@ public class LeiGuanLogBo {
     private Integer send;
     //回退
     private Integer back;
-    //使用
-    private Integer consumed;
 }

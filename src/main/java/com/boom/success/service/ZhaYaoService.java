@@ -35,10 +35,16 @@ public class ZhaYaoService {
     /**
      * 根据批次、箱号、柱号等查询炸药详情
      */
-    public ZhaYaoResponse query(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo, Integer status, Integer pageNo, Integer pageSize) {
+    public ZhaYaoResponse query(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo, Integer status, String keeper, String consumer, Integer pageNo, Integer pageSize) {
         Cnd cnd = Cnd.NEW();
         if (!StringUtils.isEmpty(batchNum)) {
             cnd = cnd.and("batch_num", "like", "%" + batchNum + "%");
+        }
+        if (!StringUtils.isEmpty(keeper)) {
+            cnd = cnd.and("keeper", "like", "%" + keeper + "%");
+        }
+        if (!StringUtils.isEmpty(consumer)) {
+            cnd = cnd.and("consumer", "like", "%" + consumer + "%");
         }
         if (boxFrom != null) {
             cnd = cnd.and("box_num", ">=", boxFrom);
@@ -98,23 +104,50 @@ public class ZhaYaoService {
     /**
      * 批量新增炸药信息，炸药柱号根据选择的规格来新增而不是让用户自己填写柱号
      */
-    public int batchInsert(ZhaYaoBatchRequest request) {
+    public int batchInsert(ZhaYaoBatchRequest request,String username) {
+        int count = 0;
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom1(),request.getBoxTo1(),request.getType1(),username);
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom2(),request.getBoxTo2(),request.getType2(),username);
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom3(),request.getBoxTo3(),request.getType3(),username);
+        return count;
+    }
+
+    private int insertList(Long date, String keeper, String batchNum, Integer from, Integer to, Integer type, String username) {
+        if (from == null && to == null) {
+            return 0;
+        }
+        if (from == null && to != null) {
+            from = to;
+        } else if (from != null && to == null) {
+            to = from;
+        }
         List<ZhaYao> list = new ArrayList<>();
-        for (int i = request.getBoxFrom(); i <= request.getBoxTo(); i++) {
-            float unit = StandardsEnums.getByCode(request.getType()).getUnit();
+        StandardsEnums standardsEnums = StandardsEnums.getByCode(type);
+        float unit =standardsEnums .getUnit();
+        for (int i = from; i <= to; i++) {
             for (int j = 1; j <= 24 / unit; j++) {
                 ZhaYao zhaYao = new ZhaYao();
-                zhaYao.setBatchNum(request.getBatchNum());
+                zhaYao.setBatchNum(batchNum);
                 zhaYao.setBoxNum(i);
                 zhaYao.setColNum(j);
                 zhaYao.setUnit(unit);
-                zhaYao.setStoreTime(request.getDate());
+                zhaYao.setStoreTime(date);
                 zhaYao.setStatus(StatusEnums.INIT.getCode());
-                zhaYao.setKeeper(request.getKeeper());
+                zhaYao.setKeeper(keeper);
                 list.add(zhaYao);
             }
         }
         List<ZhaYao> zhaYaos = dao.insert(list);
+        //计入批量操作日志
+        ZhaYaoLog log = new ZhaYaoLog();
+        log.setDate(date);
+        log.setOperator(username);
+        log.setOperation(StatusEnums.INIT.getDesc());
+        log.setBatchNum(batchNum);
+        log.setBox(from==to?(from+""):(from+"-"+to));
+        log.setCount((float) (24*(to-from+1)));
+        log.setKeeper(keeper);
+        insertLog(log);
         return zhaYaos.size();
     }
 
@@ -122,6 +155,14 @@ public class ZhaYaoService {
      * 批量新增前 检查是否已存在炸药信息
      */
     public Result checkIfExist(String batchNum, Integer boxFrom, Integer boxTo) {
+        if (boxFrom == null && boxTo == null) {
+            return Result.success(null);
+        }
+        if (boxFrom == null && boxTo != null) {
+            boxFrom = boxTo;
+        } else if (boxFrom != null && boxTo == null) {
+            boxTo = boxFrom;
+        }
         List<ZhaYao> zhaYaos = getZhaYaoList(batchNum, boxFrom, boxTo, null, null);
         if (CollectionUtils.isEmpty(zhaYaos)) {
             return Result.success(null);
@@ -143,24 +184,21 @@ public class ZhaYaoService {
     /**
      * 批量修改
      */
-    public int batchUpdate(ZhaYaoBatchRequest request) {
-        Chain chain = Chain.make("status", request.getOptType()).add("consumer", request.getConsumer());
-        if (request.getOptType() == StatusEnums.ON_GOING.getCode()) {
-            chain.add("send_time", request.getDate());
-        } else if (request.getOptType() == StatusEnums.BACK.getCode()) {
-            chain.add("back_time", request.getDate());
-        } else if (request.getOptType() == StatusEnums.CONSUMED.getCode()) {
-            chain.add("use_time", request.getDate());
+    public int batchUpdate(Long date,Integer optType,String batchNum,Integer boxNum,Integer colFrom,Integer colTo,String consumer) {
+        Chain chain = Chain.make("status", optType).add("consumer", consumer);
+        if (optType == StatusEnums.ON_GOING.getCode()) {
+            chain.add("send_time", date);
+        } else if (optType == StatusEnums.BACK.getCode()) {
+            chain.add("back_time", date);
         } else {
             return 0;
         }
-        Cnd cnd = Cnd.where("batch_num", "=", request.getBatchNum()).and("box_num", ">=", request.getBoxFrom()).
-                and("box_num", "<=", request.getBoxTo());
-        if (request.getColFrom() != null) {
-            cnd = cnd.and("col_num", ">=", request.getColFrom());
+        Cnd cnd = Cnd.where("batch_num", "=", batchNum).and("box_num", "=", boxNum);
+        if (colFrom != null) {
+            cnd = cnd.and("col_num", ">=", colFrom);
         }
-        if (request.getColTo() != null) {
-            cnd = cnd.and("col_num", "<=", request.getColTo());
+        if (colTo != null) {
+            cnd = cnd.and("col_num", "<=", colTo);
         }
         return dao.update(ZhaYao.class, chain, cnd);
     }
@@ -177,7 +215,11 @@ public class ZhaYaoService {
         return dao.query(ZhaYao.class, cnd);
     }
 
-    public ZhaYaoRecordResponse getLog(Long time, Integer pageNo, Integer pageSize) {
+    public ZhaYao queryByBox(String batchNum, Integer box) {
+        return dao.fetch(ZhaYao.class, Cnd.where("batch_num", "=", batchNum).and("box_num", "=", box));
+    }
+
+    public ZhaYaoRecordResponse getLog(Long startTime,Long endTime,String keeper,String consumer, Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageNo <= 0) {
             pageNo = 1;
         }
@@ -188,29 +230,40 @@ public class ZhaYaoService {
         ZhaYaoRecordResponse recordResponse = new ZhaYaoRecordResponse();
         List<ZhaYaoLog> logs;
         Cnd cnd = Cnd.NEW();
+        cnd.desc("date").desc("id");
+        if (!StringUtils.isEmpty(keeper)) {
+            cnd.and("keeper", "like", "%" + keeper + "%");
+        }
+        if (!StringUtils.isEmpty(consumer)) {
+            cnd.and("consumer", "like", "%" + consumer + "%");
+        }
         int stock;
-        int total;
-        if (time != null) {
-            long start = TimeUtil.getStart(time);
-            long end = TimeUtil.getEnd(time);
+        if (startTime != null || endTime != null) {
+            if (startTime == null) {
+                startTime = endTime;
+            }
+            if (endTime == null) {
+                endTime = startTime;
+            }
+            long start = TimeUtil.getStart(startTime);
+            long end = TimeUtil.getEnd(endTime);
             cnd.and("date", ">=", start).and("date", "<=", end);
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
-            total = dao.count(ZhaYaoLog.class, cnd);
             recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
             //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
             cnd = Cnd.NEW();
             cnd.and("storeTime", "<", end);
             int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
             cnd = Cnd.NEW();
-            cnd.and("use_time", "<", end);
+            cnd.and("send_time", "<", end).and("status", "=", StatusEnums.ON_GOING.getCode());
             int useSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
             stock = stockSum - useSum;
         }else{
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
-            total = dao.count(ZhaYaoLog.class, cnd);
-            int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
             cnd = Cnd.NEW();
-            cnd.and("use_time", ">", 0);
+            int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            cnd.and("status", "=", StatusEnums.ON_GOING.getCode());
             int useSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
             stock = stockSum - useSum;
         }
@@ -226,17 +279,10 @@ public class ZhaYaoService {
                 bo.setSend(count);
             } else if (e.getOperation().equals(StatusEnums.BACK.getDesc())) {
                 bo.setBack(count);
-            } else if (e.getOperation().equals(StatusEnums.CONSUMED.getDesc())) {
-                bo.setConsumed(count);
             }
-            bo.setBoxFrom(String.format("%04d", e.getBoxFrom()));
-            bo.setBoxTo(String.format("%04d", e.getBoxTo()));
-            bo.setColFrom(String.format("%02d", e.getColFrom()));
-            bo.setColTo(String.format("%02d", e.getColTo()));
             zhaYaoLogBos.add(bo);
         }
 
-        recordResponse.setTotal(total);
         recordResponse.setRecords(zhaYaoLogBos);
         recordResponse.setStock(stock);
         return recordResponse;

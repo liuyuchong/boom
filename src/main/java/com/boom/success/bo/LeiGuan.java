@@ -32,10 +32,6 @@ public class LeiGuan {
     @Column("back_time")
     private Long backTime;
 
-    //使用时间
-    @Column("use_time")
-    private Long useTime;
-
     /**
      * @see StatusEnums
      */

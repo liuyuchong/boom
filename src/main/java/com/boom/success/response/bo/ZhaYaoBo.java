@@ -1,8 +1,6 @@
 package com.boom.success.response.bo;
 
-import com.boom.success.consts.StatusEnums;
 import lombok.Data;
-import org.nutz.dao.entity.annotation.Column;
 
 @Data
 public class ZhaYaoBo {

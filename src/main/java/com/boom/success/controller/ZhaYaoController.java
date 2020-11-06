@@ -12,16 +12,13 @@ import com.boom.success.response.ZhaYaoResponse;
 import com.boom.success.service.ZhaYaoService;
 import com.boom.success.util.LoginUtil;
 import com.boom.success.util.NumberCheck;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController

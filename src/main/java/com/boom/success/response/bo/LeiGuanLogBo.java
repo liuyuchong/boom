@@ -1,9 +1,6 @@
 package com.boom.success.response.bo;
 
-import com.boom.success.consts.StatusEnums;
 import lombok.Data;
-import org.nutz.dao.entity.annotation.Column;
-import org.nutz.dao.entity.annotation.Id;
 
 @Data
 public class LeiGuanLogBo {

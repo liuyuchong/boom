@@ -1,5 +1,9 @@
 package com.boom.success.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.boom.success.bo.Detail;
 import com.boom.success.bo.LeiGuan;
 import com.boom.success.bo.Video;
@@ -8,15 +12,25 @@ import com.boom.success.consts.Result;
 import com.boom.success.consts.VideoTypeEnums;
 import com.boom.success.request.DetailResponse;
 import com.boom.success.request.UrlUpdateReqeust;
+import com.boom.success.response.bo.DetailBo;
 import com.boom.success.service.DetailService;
 import com.boom.success.service.LeiGuanService;
 import com.boom.success.service.ZhaYaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class DetailController {
@@ -38,9 +52,11 @@ public class DetailController {
                                         @RequestParam(required = false) Integer childCode,
                                         @RequestParam(required = false) String batchNum,
                                         @RequestParam(required = false) Integer boxNum,
+                                        @RequestParam(required = false) String down,
+                                        @RequestParam(required = false) String packager,
                                         @RequestParam(required = false) Integer pageNo,
                                         @RequestParam(required = false) Integer pageSize) {
-        return Result.success(detailService.query(date, lineNum, stakeNum, fixCode, childCode, batchNum, boxNum, pageNo, pageSize));
+        return Result.success(detailService.query(date, lineNum, stakeNum, fixCode, childCode, batchNum, boxNum, down, packager, pageNo, pageSize));
     }
 
     /**
@@ -135,7 +151,7 @@ public class DetailController {
             if (detailService.existZhayao(batchNum, boxNum, toFormat)) {
                 return Result.fail(GeneralCode.Param_Error.getCode(), "炸药已被使用！");
             }
-        }else{
+        } else {
             //如果没有填写to 那么应该只计算单柱炸药而不是计算范围
             to = from;
         }
@@ -156,13 +172,13 @@ public class DetailController {
             return Result.fail(GeneralCode.Param_Error);
         }
         if (detail.getId() == null) {
-            return Result.fail(GeneralCode.Param_Error.getCode(),"请填写耗材信息主键id");
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请填写耗材信息主键id");
         }
         Detail oldDetail = detailService.getById(detail.getId());
         if (oldDetail == null) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "耗材信息不存在！");
         }
-        if (detail.getDate() != null && detail.getDate() > 0&& detail.getDate().longValue() != oldDetail.getDate()) {
+        if (detail.getDate() != null && detail.getDate() > 0 && detail.getDate().longValue() != oldDetail.getDate()) {
             oldDetail.setDate(detail.getDate());
         }
         if (detail.getLineNum() != null && detail.getLineNum().intValue() != oldDetail.getLineNum()) {
@@ -238,7 +254,7 @@ public class DetailController {
         }
         VideoTypeEnums type = VideoTypeEnums.get(reqeust.getType());
         if (type == null) {
-            return Result.fail(GeneralCode.Param_Error.getCode(),"请选择正确的视频类型");
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请选择正确的视频类型");
         }
         Detail oldDetail = detailService.getById(reqeust.getDetailId());
         if (oldDetail == null) {
@@ -270,47 +286,51 @@ public class DetailController {
     }
 
 
-    @RequestMapping(value = "/download", method = RequestMethod.GET)
-    public void downloadFile(HttpServletResponse response) {
-        //这里文件名称是通过参数传递过来的，要是不需要，直接可以写在这里。String fileName = "a.doc";
-//        String path = "C:\\Users\\Administrator\\Desktop\\a.txt";  //这里指定路径在C盘根目录，按需改动即可
-//        byte[] buffer = new byte[1024];
-        byte[] buffer = "test".getBytes();
-        FileInputStream fis = null;
-//        BufferedInputStream bis = null;
-        try {
-//            File file = new File(path, fileName);
-            response.setContentType("application/x-download");
-            response.addHeader("Content-Disposition", "attachment;filename=detail.txt");
-//            fis = new FileInputStream(file);
-//            bis = new BufferedInputStream(fis);
-            OutputStream os = response.getOutputStream();
-//            int i = bis.read(buffer);
-//            while (i != -1) {
-                os.write(buffer);
-//                i = bis.read(buffer);
-//            }
-        }catch(FileNotFoundException e) {
-            e.printStackTrace();
-            System.out.println("The file not found!");
+    @RequestMapping(value = "/api/detail/download", method = RequestMethod.GET)
+    public void downloadFile(HttpServletResponse response,
+                             @RequestParam(required = false) Long date,
+                             @RequestParam(required = false) Integer lineNum,
+                             @RequestParam(required = false) String stakeNum,
+                             @RequestParam(required = false) String fixCode,
+                             @RequestParam(required = false) Integer childCode,
+                             @RequestParam(required = false) String batchNum,
+                             @RequestParam(required = false) Integer boxNum,
+                             @RequestParam(required = false) String down,
+                             @RequestParam(required = false) String packager) throws IOException {
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally{
-//            if (bis != null) {
-//                try {
-//                    bis.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        List<DetailBo> details = detailService.query(date, lineNum, stakeNum, fixCode, childCode, batchNum, boxNum, down, packager);
+        //下载设置
+        response.setContentType("mutipart/form-data");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment; filename=" + "detail.xlsx");
+        response.setHeader("Pragma", "No-cache");//设置头
+        response.setHeader("Cache-Control", "no-cache");//设置头
+        response.setDateHeader("Expires", 0);//设置日期头
+        //获取模板
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("template/detail.xlsx");
+        OutputStream out = response.getOutputStream();
+        ExcelWriter excelWriter = EasyExcel.write(out).withTemplate(inputStream).build();
+        WriteSheet writeSheet = EasyExcel.writerSheet().build();
+
+        if (CollectionUtils.isEmpty(details)) {
+            //开始导出
+            excelWriter.finish();
+            return;
         }
+
+        //表头填充
+        Map<String, Object> map = new HashMap<>();
+        map.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date(details.get(0).getDate())));
+        excelWriter.fill(map, writeSheet);
+
+        //list填充
+        FillConfig fillConfig = FillConfig.builder().forceNewRow(Boolean.TRUE).build();
+        //填充两行list
+        excelWriter.fill(details, fillConfig, writeSheet);
+
+        //开始导出
+        excelWriter.finish();
+        out.flush();
+        out.close();
     }
 }

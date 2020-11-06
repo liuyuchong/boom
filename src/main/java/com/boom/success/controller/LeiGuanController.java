@@ -1,7 +1,6 @@
 package com.boom.success.controller;
 
 import com.boom.success.bo.LeiGuan;
-import com.boom.success.bo.LeiGuanLog;
 import com.boom.success.consts.GeneralCode;
 import com.boom.success.consts.Result;
 import com.boom.success.consts.StatusEnums;

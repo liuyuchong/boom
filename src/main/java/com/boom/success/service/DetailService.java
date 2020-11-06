@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,7 +34,7 @@ public class DetailService {
         return dao.update(detail);
     }
 
-    public DetailResponse query(Long date, Integer lineNum, String stakeNum, String fixCode, Integer childCode, String batchNum, Integer boxNum, Integer pageNo, Integer pageSize) {
+    public DetailResponse query(Long date, Integer lineNum, String stakeNum, String fixCode, Integer childCode, String batchNum, Integer boxNum, String down, String packager, Integer pageNo, Integer pageSize) {
         Cnd cnd = Cnd.NEW();
         if (date != null) {
             long start = TimeUtil.getStart(date);
@@ -51,6 +50,12 @@ public class DetailService {
         if (!StringUtils.isEmpty(fixCode)) {
             cnd.and("fix_code", "like", "%" + fixCode + "%");
         }
+        if (!StringUtils.isEmpty(down)) {
+            cnd = cnd.and("down", "like", "%" + down + "%");
+        }
+        if (!StringUtils.isEmpty(packager)) {
+            cnd = cnd.and("packager", "like", "%" + packager + "%");
+        }
         if (childCode != null) {
             cnd.and("child_code", "=", childCode);
         }
@@ -60,13 +65,13 @@ public class DetailService {
         if (boxNum != null) {
             cnd.and("box_num", "=", boxNum);
         }
-        if (pageNo==null||pageNo <= 0) {
+        if (pageNo == null || pageNo <= 0) {
             pageNo = 1;
         }
-        if (pageSize==null||pageSize <= 0) {
+        if (pageSize == null || pageSize <= 0) {
             pageSize = 100;
         }
-        OrderBy orderBy = cnd.desc("id");
+        OrderBy orderBy = cnd.desc("date").desc("id");
         List<Detail> list = dao.query(Detail.class, orderBy, new Pager(pageNo, pageSize));
         int total = dao.count(Detail.class, cnd);
         DetailResponse detailResponse = new DetailResponse();
@@ -92,6 +97,50 @@ public class DetailService {
     public boolean existZhayao(String batchNum, int boxNum, String col) {
         Detail detail = dao.fetch(Detail.class, Cnd.where("batch_num", "=", batchNum).and("box_num", "=", boxNum).and("col_num", "like", "%"+col+"%"));
         return detail != null;
+    }
+
+    public List<DetailBo> query(Long date, Integer lineNum, String stakeNum, String fixCode, Integer childCode, String batchNum, Integer boxNum, String down, String packager) {
+        Cnd cnd = Cnd.NEW();
+        if (date != null) {
+            long start = TimeUtil.getStart(date);
+            long end = TimeUtil.getEnd(date);
+            cnd.and("date", ">=", start).and("date", "<=", end);
+        }
+        if (lineNum != null) {
+            cnd.and("line_num", "=", lineNum);
+        }
+        if (!StringUtils.isEmpty(stakeNum)) {
+            cnd.and("stake_num", "like", "%" + stakeNum + "%");
+        }
+        if (!StringUtils.isEmpty(fixCode)) {
+            cnd.and("fix_code", "like", "%" + fixCode + "%");
+        }
+        if (!StringUtils.isEmpty(down)) {
+            cnd = cnd.and("down", "like", "%" + down + "%");
+        }
+        if (!StringUtils.isEmpty(packager)) {
+            cnd = cnd.and("packager", "like", "%" + packager + "%");
+        }
+        if (childCode != null) {
+            cnd.and("child_code", "=", childCode);
+        }
+        if (!StringUtils.isEmpty(batchNum)) {
+            cnd.and("batch_num", "like", "%" + batchNum + "%");
+        }
+        if (boxNum != null) {
+            cnd.and("box_num", "=", boxNum);
+        }
+        OrderBy orderBy = cnd.desc("date").desc("id");
+        List<Detail> list = dao.query(Detail.class, orderBy);
+        List<DetailBo> detailBos = new ArrayList<>();
+        for (Detail e : list) {
+            DetailBo bo = new DetailBo();
+            BeanUtils.copyProperties(e, bo);
+            bo.setChildCode(String.format("%05d", e.getChildCode()));
+            bo.setBoxNum(String.format("%02d", e.getBoxNum()));
+            detailBos.add(bo);
+        }
+        return detailBos;
     }
 
 }

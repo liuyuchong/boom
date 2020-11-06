@@ -2,9 +2,6 @@ package com.boom.success.response.bo;
 
 import com.boom.success.bo.Video;
 import lombok.Data;
-import org.nutz.dao.entity.annotation.ColDefine;
-import org.nutz.dao.entity.annotation.ColType;
-import org.nutz.dao.entity.annotation.Column;
 
 @Data
 public class DetailBo {

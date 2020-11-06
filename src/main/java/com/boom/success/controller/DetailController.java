@@ -7,8 +7,10 @@ import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.boom.success.bo.Detail;
 import com.boom.success.bo.LeiGuan;
 import com.boom.success.bo.Video;
+import com.boom.success.bo.ZhaYao;
 import com.boom.success.consts.GeneralCode;
 import com.boom.success.consts.Result;
+import com.boom.success.consts.StatusEnums;
 import com.boom.success.consts.VideoTypeEnums;
 import com.boom.success.request.DetailResponse;
 import com.boom.success.request.UrlUpdateReqeust;
@@ -116,9 +118,12 @@ public class DetailController {
         if (leiGuan == null) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "雷管信息不存在！");
         }
-        if (detailService.existLeiguan(detail.getFixCode(), detail.getChildCode())) {
-            return Result.fail(GeneralCode.Param_Error.getCode(), "雷管已被使用！");
+        if (leiGuan.getStatus() != StatusEnums.ON_GOING.getCode()) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "请先发出雷管，然后再填写明细！");
         }
+//        if (detailService.existLeiguan(detail.getFixCode(), detail.getChildCode())) {
+//            return Result.fail(GeneralCode.Param_Error.getCode(), "雷管已被使用！");
+//        }
 
         return Result.success(detailService.insert(detail));
     }
@@ -157,7 +162,16 @@ public class DetailController {
         }
 
 
-        return zhaYaoService.checkIfExist2(batchNum, boxNum, boxNum, from, to);
+        List<ZhaYao> zhaYaos = zhaYaoService.getZhaYaoList(batchNum, boxNum, boxNum, from, to);
+        if (CollectionUtils.isEmpty(zhaYaos)) {
+            return Result.fail(GeneralCode.Param_Error.getCode(), "炸药信息不存在");
+        }
+        for (ZhaYao e : zhaYaos) {
+            if (e.getStatus() != StatusEnums.ON_GOING.getCode()) {
+                return Result.fail(GeneralCode.Param_Error.getCode(), "请先发出炸药，再填写明细！");
+            }
+        }
+        return Result.success(zhaYaos.parallelStream().mapToDouble(ZhaYao::getUnit).sum());
     }
 
     /**
@@ -204,6 +218,9 @@ public class DetailController {
             LeiGuan leiGuan = leiGuanService.queryByCode(oldDetail.getFixCode(), oldDetail.getChildCode());
             if (leiGuan == null) {
                 return Result.fail(GeneralCode.Param_Error.getCode(), "雷管信息不存在！");
+            }
+            if (leiGuan.getStatus() != StatusEnums.ON_GOING.getCode()) {
+                return Result.fail(GeneralCode.Param_Error.getCode(), "请先发出雷管，然后再填写明细！");
             }
         }
 

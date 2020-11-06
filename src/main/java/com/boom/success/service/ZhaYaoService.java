@@ -203,7 +203,7 @@ public class ZhaYaoService {
         return dao.update(ZhaYao.class, chain, cnd);
     }
 
-    private List<ZhaYao> getZhaYaoList(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo) {
+    public List<ZhaYao> getZhaYaoList(String batchNum, Integer boxFrom, Integer boxTo, Integer colFrom, Integer colTo) {
         Cnd cnd = Cnd.NEW();
         cnd = cnd.and("batch_num", "=", batchNum).and("box_num", ">=", boxFrom).and("box_num", "<=", boxTo);
         if (colFrom != null) {

@@ -237,7 +237,7 @@ public class ZhaYaoService {
         if (!StringUtils.isEmpty(consumer)) {
             cnd.and("consumer", "like", "%" + consumer + "%");
         }
-        int stock;
+        double stock;
         if (startTime != null || endTime != null) {
             if (startTime == null) {
                 startTime = endTime;
@@ -253,18 +253,18 @@ public class ZhaYaoService {
             //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
             cnd = Cnd.NEW();
             cnd.and("storeTime", "<", end);
-            int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            double stockSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
             cnd = Cnd.NEW();
             cnd.and("send_time", "<", end).and("status", "=", StatusEnums.ON_GOING.getCode());
-            int useSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            double useSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
             stock = stockSum - useSum;
         }else{
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
             recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
             cnd = Cnd.NEW();
-            int stockSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            double stockSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
             cnd.and("status", "=", StatusEnums.ON_GOING.getCode());
-            int useSum = dao.func(ZhaYao.class, "sum", "unit", cnd);
+            double useSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
             stock = stockSum - useSum;
         }
 
@@ -284,7 +284,7 @@ public class ZhaYaoService {
         }
 
         recordResponse.setRecords(zhaYaoLogBos);
-        recordResponse.setStock(stock);
+        recordResponse.setStock(String.format("%.2f", stock));
         return recordResponse;
     }
 }

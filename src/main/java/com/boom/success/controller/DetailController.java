@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -317,9 +318,19 @@ public class DetailController {
 
         List<DetailBo> details = detailService.query(date, lineNum, stakeNum, fixCode, childCode, batchNum, boxNum, down, packager);
         //下载设置
+        String fileName = "detail:"
+                + (date == null ? "" : (new SimpleDateFormat("MM-dd").format(new Date(date))))
+                + (lineNum == null ? "" : ("线(" + lineNum + ")"))
+                + (StringUtils.isEmpty(stakeNum)? "" : ("桩(" + stakeNum + ")"))
+                + (StringUtils.isEmpty(fixCode) ? "" : ("固(" + fixCode + ")"))
+                + (childCode == null ? "" : ("发(" + childCode + ")"))
+                + (StringUtils.isEmpty(batchNum) ? "" : ("批(" + batchNum + ")"))
+                + (boxNum == null ? "" : ("箱(") + boxNum + ")")
+                + (StringUtils.isEmpty(down) ? "" : ("下药(" + down + ")"))
+                + (StringUtils.isEmpty(packager) ? "" : ("包药(" + packager + ")"));
         response.setContentType("mutipart/form-data");
         response.setCharacterEncoding("utf-8");
-        response.setHeader("Content-disposition", "attachment; filename=" + "detail.xlsx");
+        response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(fileName + ".xlsx","utf-8"));
         response.setHeader("Pragma", "No-cache");//设置头
         response.setHeader("Cache-Control", "no-cache");//设置头
         response.setDateHeader("Expires", 0);//设置日期头

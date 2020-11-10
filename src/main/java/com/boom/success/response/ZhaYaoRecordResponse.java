@@ -9,6 +9,6 @@ import java.util.List;
 public class ZhaYaoRecordResponse {
     private List<ZhaYaoLogBo> records;
     //库存
-    private int stock;
+    private String stock;
     private int total;
 }

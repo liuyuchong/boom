@@ -11,7 +11,7 @@
  Target Server Version : 50732
  File Encoding         : 65001
 
- Date: 06/11/2020 03:53:08
+ Date: 12/11/2020 23:42:53
 */
 
 SET NAMES utf8mb4;
@@ -110,8 +110,8 @@ CREATE TABLE `zhayao_info`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '批次号',
   `box_num` int(20) NOT NULL COMMENT '箱号',
-  `col_num` tinyint(4) NOT NULL COMMENT '柱号',
-  `unit` float(20, 2) NOT NULL COMMENT '单位（kg）',
+  `col_num` tinyint(4) UNSIGNED NOT NULL COMMENT '柱号',
+  `unit` float(20, 3) NOT NULL COMMENT '单位（kg）',
   `store_time` bigint(20) NOT NULL COMMENT '入库时间',
   `send_time` bigint(20) NULL DEFAULT NULL COMMENT '发出时间',
   `back_time` bigint(20) NULL DEFAULT NULL COMMENT '退还时间',
@@ -133,10 +133,11 @@ CREATE TABLE `zhayao_log`  (
   `batch_num` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '批次号',
   `box` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '箱号起始值',
   `col` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '柱号结束值',
-  `count` float(20, 2) NOT NULL COMMENT '操作数值（kg）',
+  `count` float(20, 3) NOT NULL COMMENT '操作数值（kg）',
   `keeper` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '保管人',
   `consumer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '领退人',
   `operator` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '系统录入人员',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+SET FOREIGN_KEY_CHECKS = 1;

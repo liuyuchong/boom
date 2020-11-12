@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -50,10 +51,45 @@ public class ZhaYaoController {
      */
     @RequestMapping(value = "/api/zhayao", method = RequestMethod.PUT)
     public Result<Boolean> update(@RequestBody ZhaYao zhaYao, HttpServletRequest servletRequest) {
-        if (zhaYao.getId() == null) {
+        String username = LoginUtil.getUsername(servletRequest);
+        if (username == null) {
+            return Result.fail(GeneralCode.NOT_AUTHORIZED.getCode(), "请登录");
+        }
+        if (zhaYao.getUnit() <= 0||24000%(1000*zhaYao.getUnit())!=0) {
+            return Result.fail(GeneralCode.Param_Error.getCode(),"请填写正确的规格（重量）");
+        }
+        ZhaYao oldZhaYao = service.queryById(zhaYao.getId());
+        if (oldZhaYao == null) {
             return Result.fail(GeneralCode.Param_Error);
         }
+        if (!Objects.equals(zhaYao.getBatchNum(), oldZhaYao.getBatchNum())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(),"批次号不能修改");
+        }
+        if (!Objects.equals(zhaYao.getBoxNum(), oldZhaYao.getBoxNum())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(),"箱号不能修改");
+        }
+        if (!Objects.equals(zhaYao.getColNum(), oldZhaYao.getColNum())) {
+            return Result.fail(GeneralCode.Param_Error.getCode(),"柱号不能修改");
+        }
+        if (!Objects.equals(zhaYao.getUnit(), oldZhaYao.getUnit())) {
+            if (zhaYao.getStoreTime() != null && zhaYao.getStoreTime() > 0 && !Objects.equals(zhaYao.getStoreTime(), oldZhaYao.getStoreTime())) {
+                oldZhaYao.setStoreTime(zhaYao.getStoreTime());
+            }
+            if (!StringUtils.isEmpty(zhaYao.getKeeper()) && !Objects.equals(zhaYao.getKeeper(), oldZhaYao.getKeeper())) {
+                oldZhaYao.setKeeper(zhaYao.getKeeper());
+            }
+            return updateUnit(oldZhaYao,zhaYao.getUnit(),username);
+        }
         return Result.success(service.update(zhaYao));
+    }
+
+    private Result<Boolean> updateUnit(ZhaYao oldZhaYao,float unit, String username) {
+        //1. 删除旧的炸药信息
+        service.delete(oldZhaYao.getBatchNum(), oldZhaYao.getBoxNum(),username);
+
+        //2. 插入新的炸药信息
+        service.insertList(oldZhaYao.getStoreTime(), oldZhaYao.getKeeper(), oldZhaYao.getBatchNum(), oldZhaYao.getBoxNum(), oldZhaYao.getBoxNum(), unit, username);
+        return Result.success(true);
     }
 
     /**

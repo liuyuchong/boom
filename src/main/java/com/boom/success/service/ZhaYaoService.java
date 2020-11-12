@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -106,13 +107,19 @@ public class ZhaYaoService {
      */
     public int batchInsert(ZhaYaoBatchRequest request,String username) {
         int count = 0;
-        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom1(),request.getBoxTo1(),request.getType1(),username);
-        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom2(),request.getBoxTo2(),request.getType2(),username);
-        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom3(),request.getBoxTo3(),request.getType3(),username);
+        StandardsEnums standardsEnums1 = StandardsEnums.getByCode(request.getType1());
+        float unit1 =standardsEnums1.getUnit();
+        StandardsEnums standardsEnums2 = StandardsEnums.getByCode(request.getType2());
+        float unit2 =standardsEnums2.getUnit();
+        StandardsEnums standardsEnums3 = StandardsEnums.getByCode(request.getType3());
+        float unit3 =standardsEnums3.getUnit();
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom1(),request.getBoxTo1(),unit1,username);
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom2(),request.getBoxTo2(),unit2,username);
+        count += insertList(request.getDate(),request.getKeeper(),request.getBatchNum(),request.getBoxFrom3(),request.getBoxTo3(),unit3,username);
         return count;
     }
 
-    private int insertList(Long date, String keeper, String batchNum, Integer from, Integer to, Integer type, String username) {
+    public int insertList(Long date, String keeper, String batchNum, Integer from, Integer to, float unit, String username) {
         if (from == null && to == null) {
             return 0;
         }
@@ -122,8 +129,6 @@ public class ZhaYaoService {
             to = from;
         }
         List<ZhaYao> list = new ArrayList<>();
-        StandardsEnums standardsEnums = StandardsEnums.getByCode(type);
-        float unit =standardsEnums .getUnit();
         for (int i = from; i <= to; i++) {
             for (int j = 1; j <= 24 / unit; j++) {
                 ZhaYao zhaYao = new ZhaYao();
@@ -253,18 +258,22 @@ public class ZhaYaoService {
             //当日库存计算： 当日之前的累计存入-当日之前的累计消耗
             cnd = Cnd.NEW();
             cnd.and("storeTime", "<", end);
-            double stockSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            Object count = dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            double stockSum = count == null ? 0 : (double)count;
             cnd = Cnd.NEW();
             cnd.and("send_time", "<", end).and("status", "=", StatusEnums.ON_GOING.getCode());
-            double useSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            count = dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            double useSum = count == null ? 0 : (double)count;
             stock = stockSum - useSum;
         }else{
             logs = dao.query(ZhaYaoLog.class, cnd, new Pager(pageNo, pageSize));
             recordResponse.setTotal(dao.count(ZhaYaoLog.class, cnd));
             cnd = Cnd.NEW();
-            double stockSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            Object count = dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            double stockSum = count == null ? 0 : (double)count;
             cnd.and("status", "=", StatusEnums.ON_GOING.getCode());
-            double useSum = (double) dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            count = dao.func2(ZhaYao.class, "sum", "unit", cnd);
+            double useSum = count == null ? 0 : (double)count;
             stock = stockSum - useSum;
         }
 
@@ -284,8 +293,31 @@ public class ZhaYaoService {
         }
 
         recordResponse.setRecords(zhaYaoLogBos);
-        recordResponse.setStock(String.format("%.2f", stock));
+        recordResponse.setStock(String.format("%.3f", stock));
         return recordResponse;
+    }
+
+    public ZhaYao queryById(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return dao.fetch(ZhaYao.class, id);
+    }
+
+    public void delete(String batchNum, Integer boxNum,String username) {
+        List<ZhaYao> zhaYaos = dao.query(ZhaYao.class, Cnd.where("batch_num", "=", batchNum).and("box_num", "=", boxNum));
+        if (!CollectionUtils.isEmpty(zhaYaos)) {
+            dao.delete(zhaYaos);
+            ZhaYaoLog log = new ZhaYaoLog();
+            log.setDate(zhaYaos.get(0).getStoreTime());
+            log.setOperator(username);
+            log.setOperation("删除");
+            log.setBatchNum(batchNum);
+            log.setBox(boxNum+"");
+            log.setCol("1-" + (int)(24000 / (1000 * zhaYaos.get(0).getUnit())));
+            log.setCount(24f);
+            insertLog(log);
+        }
     }
 }
 

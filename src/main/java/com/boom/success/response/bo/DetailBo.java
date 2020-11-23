@@ -7,9 +7,9 @@ import lombok.Data;
 public class DetailBo {
     private Long id;
     private Long date;
-    private Integer lineNum;
+    private String lineNum;
     private String stakeNum;
-    private Integer height;
+    private Float height;
     private String fixCode;
     private String childCode;
     private String batchNum;

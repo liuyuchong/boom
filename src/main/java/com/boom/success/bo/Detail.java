@@ -13,13 +13,13 @@ public class Detail {
     private Long date;
 
     @Column("line_num")
-    private Integer lineNum;
+    private String lineNum;
 
     @Column("stake_num")
     private String stakeNum;
 
     @Column
-    private Integer height;
+    private Float height;
 
     @Column("fix_code")
     private String fixCode;

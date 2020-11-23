@@ -75,7 +75,7 @@ public class DetailController {
         if (detail.getDate() == null || detail.getDate() < 0) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "请填写日期");
         }
-        if (detail.getLineNum() == null || detail.getLineNum() < 0) {
+        if (detail.getLineNum() == null) {
             return Result.fail(GeneralCode.Param_Error.getCode(), "请填写线束号");
         }
         if (StringUtils.isEmpty(detail.getStakeNum())) {
@@ -195,7 +195,7 @@ public class DetailController {
         if (detail.getDate() != null && detail.getDate() > 0 && detail.getDate().longValue() != oldDetail.getDate()) {
             oldDetail.setDate(detail.getDate());
         }
-        if (detail.getLineNum() != null && detail.getLineNum().intValue() != oldDetail.getLineNum()) {
+        if (detail.getLineNum() != null && !detail.getLineNum().equals(oldDetail.getLineNum())) {
             oldDetail.setLineNum(detail.getLineNum());
         }
         if (!StringUtils.isEmpty(detail.getStakeNum()) && !detail.getStakeNum().equals(oldDetail.getStakeNum())) {

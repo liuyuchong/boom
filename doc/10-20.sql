@@ -141,3 +141,10 @@ CREATE TABLE `zhayao_log`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+ALTER TABLE `boom`.`boom_detail`
+MODIFY COLUMN `line_num` varchar(200) NOT NULL COMMENT '线束号' AFTER `date`,
+MODIFY COLUMN `height` float(20, 1) NOT NULL COMMENT '井深' AFTER `stake_num`;
+
+INSERT INTO `boom`.`boom_detail`( `date`, `line_num`, `stake_num`, `height`, `fix_code`, `child_code`, `batch_num`, `box_num`, `col_num`, `count`, `down`, `packager`, `mark`, `videos`)
+VALUES (1606140323458, '实验', '1', 1.1, '15001', 1, '15001', 1, '02-02', 2.0, '1', '1', '', '{\"badVideo\": null, \"useVideo\": null, \"sendVideo\": null, \"guardVideo\": null, \"packageVideo\": null}');

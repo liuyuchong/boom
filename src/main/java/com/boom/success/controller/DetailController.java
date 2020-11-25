@@ -201,7 +201,7 @@ public class DetailController {
         if (!StringUtils.isEmpty(detail.getStakeNum()) && !detail.getStakeNum().equals(oldDetail.getStakeNum())) {
             oldDetail.setStakeNum(detail.getStakeNum());
         }
-        if (detail.getHeight() != null && detail.getHeight() >= 0 && detail.getHeight().intValue() != oldDetail.getHeight()) {
+        if (detail.getHeight() != null && detail.getHeight() >= 0 && detail.getHeight().floatValue() != oldDetail.getHeight()) {
             oldDetail.setHeight(detail.getHeight());
         }
         boolean updateLeiguanInfo = false;
